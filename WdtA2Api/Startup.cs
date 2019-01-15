@@ -1,32 +1,42 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Data.SqlClient;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+
+using Newtonsoft.Json;
+
+using WdtA2Api.Models;
+using WdtA2Api.Utils;
 
 namespace WdtA2Api
 {
     public class Startup
     {
+        private readonly Lazy<string> _connectionString;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            this.Configuration = configuration;
+            this._connectionString = new Lazy<string>(
+                () =>
+                    {
+                        var secrets = this.Configuration.GetSection(nameof(DbSecrets)).Get<DbSecrets>();
+                        var sqlString = new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"))
+                                            {
+                                                UserID = secrets.Uid, Password = secrets.Password
+                                            };
+                        return sqlString.ConnectionString;
+                    });
         }
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-        }
+        private string ConnectionString => this._connectionString.Value;
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -41,8 +51,39 @@ namespace WdtA2Api
                 app.UseHsts();
             }
 
+            app.UseSwagger();
+            app.UseSwaggerUi3();
+
+            app.UseHealthChecks("/ready");
+
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+        // This method gets called by the runtime. Use this method to add services to the container.
+        // using net core 2_2 features as per https://www.youtube.com/watch?v=_vw3hcnSA1Y&t=420s
+        // https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-2.2&tabs=visual-studio%2Cvisual-studio-xml
+        public void ConfigureServices(IServiceCollection services)
+        {
+
+            services.AddMvc()
+                .AddJsonOptions(
+                    options =>
+                        {
+                            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                            options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                        })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            // Register the Swagger services
+            services.AddSwaggerDocument();
+
+            services.AddDbContext<WdtA2ApiContext>(options =>                    
+                        options
+                            .UseLazyLoadingProxies()
+                            .UseSqlServer(this.ConnectionString));
+           services.AddHealthChecks()
+               .AddDbContextCheck<WdtA2ApiContext>();
         }
     }
 }
