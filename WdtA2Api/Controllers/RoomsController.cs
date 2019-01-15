@@ -42,65 +42,65 @@ namespace WdtA2Api.Controllers
             return room;
         }
 
-        // PUT: api/Rooms/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRoom(string id, Room room)
-        {
-            if (id != room.RoomID)
-            {
-                return BadRequest();
-            }
+        /*   // PUT: api/Rooms/5
+           [HttpPut("{id}")]
+           public async Task<IActionResult> PutRoom(string id, Room room)
+           {
+               if (id != room.RoomID)
+               {
+                   return BadRequest();
+               }
 
-            _context.Entry(room).State = EntityState.Modified;
+               _context.Entry(room).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!RoomExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+               try
+               {
+                   await _context.SaveChangesAsync();
+               }
+               catch (DbUpdateConcurrencyException)
+               {
+                   if (!RoomExists(id))
+                   {
+                       return NotFound();
+                   }
+                   else
+                   {
+                       throw;
+                   }
+               }
 
-            return NoContent();
-        }
+               return NoContent();
+           } */
 
         // POST: api/Rooms
-        [HttpPost]
-        public async Task<ActionResult<Room>> PostRoom(Room room)
-        {
-            _context.Room.Add(room);
-            await _context.SaveChangesAsync();
+        /* [HttpPost]
+          public async Task<ActionResult<Room>> PostRoom(Room room)
+         {
+             _context.Room.Add(room);
+             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRoom", new { id = room.RoomID }, room);
-        }
+             return CreatedAtAction("GetRoom", new { id = room.RoomID }, room);
+         } */
 
-        // DELETE: api/Rooms/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Room>> DeleteRoom(string id)
-        {
-            var room = await _context.Room.FindAsync(id);
-            if (room == null)
-            {
-                return NotFound();
-            }
+        /*  // DELETE: api/Rooms/5
+          [HttpDelete("{id}")]
+          public async Task<ActionResult<Room>> DeleteRoom(string id)
+          {
+              var room = await _context.Room.FindAsync(id);
+              if (room == null)
+              {
+                  return NotFound();
+              }
 
-            _context.Room.Remove(room);
-            await _context.SaveChangesAsync();
+              _context.Room.Remove(room);
+              await _context.SaveChangesAsync();
 
-            return room;
-        }
+              return room;
+          }  
 
-        private bool RoomExists(string id)
-        {
-            return _context.Room.Any(e => e.RoomID == id);
-        }
+          private bool RoomExists(string id)
+          {
+              return _context.Room.Any(e => e.RoomID == id);
+          } */
     }
 }

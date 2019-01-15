@@ -12,6 +12,7 @@ namespace WdtA2Api.Models
     {
         [Key, StringLength(10)]
         public string RoomID { get; set; }
+
         public virtual ICollection<Slot> Slots { get; set; }
     }
 }

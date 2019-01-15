@@ -41,7 +41,7 @@ namespace WdtA2Api.Controllers
             return user;
         }
 
-        // PUT: api/Users/5
+    /*    // PUT: api/Users/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(string id, User user)
         {
@@ -95,11 +95,11 @@ namespace WdtA2Api.Controllers
             await _context.SaveChangesAsync();
 
             return user;
-        }
+        } 
 
         private bool UserExists(string id)
         {
             return _context.User.Any(e => e.UserID == id);
-        }
+        } */
     }
 }

@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using WdtA2Api.Models;
 
 namespace WdtA2Api.Controllers
@@ -20,68 +21,7 @@ namespace WdtA2Api.Controllers
             _context = context;
         }
 
-        // GET: api/Slots
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Slot>>> GetSlot()
-        {
-            return await _context.Slot.ToListAsync();
-        }
-
-        // GET: api/Slots/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Slot>> GetSlot(string id)
-        {
-            var slot = await _context.Slot.FindAsync(id);
-
-            if (slot == null)
-            {
-                return NotFound();
-            }
-
-            return slot;
-        }
-
-        // PUT: api/Slots/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSlot(string id, Slot slot)
-        {
-            if (id != slot.RoomID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(slot).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SlotExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
-        }
-
-        // POST: api/Slots
-        [HttpPost]
-        public async Task<ActionResult<Slot>> PostSlot(Slot slot)
-        {
-            _context.Slot.Add(slot);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetSlot", new { id = slot.RoomID }, slot);
-        }
-
-        // DELETE: api/Slots/5
+        /* // DELETE: api/Slots/5
         [HttpDelete("{id}")]
         public async Task<ActionResult<Slot>> DeleteSlot(string id)
         {
@@ -95,11 +35,96 @@ namespace WdtA2Api.Controllers
             await _context.SaveChangesAsync();
 
             return slot;
+        } */
+
+        // GET: api/Slots
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Slot>>> GetSlot()
+        {
+            return await _context.Slot.ToListAsync();
         }
 
-        private bool SlotExists(string id)
+        // GET: api/Slots/5/2019-01-15T13:00
+        [Route("{RoomID}/{StartTime:datetime}")]
+        [HttpGet("{RoomID}/{StartTime}")]
+        public async Task<ActionResult<Slot>> GetSlot(string roomId, DateTime startTime)
         {
-            return _context.Slot.Any(e => e.RoomID == id);
+            var slot = await _context.Slot.FirstOrDefaultAsync(
+                           sl => sl.RoomID.Equals(roomId.ToUpper()) && sl.StartTime.Date.Equals(startTime.Date)
+                                                                    && sl.StartTime.Hour.Equals(startTime.Hour));
+
+            if (slot == null)
+            {
+                return NotFound();
+            }
+
+            return slot;
+        }
+
+        // POST: api/Slots
+        [HttpPost]
+        public async Task<ActionResult<Slot>> PostSlot(Slot slot)
+        {
+            if (SlotExists(slot.RoomID, slot.StartTime))
+            {
+                return BadRequest();
+            }
+
+            _context.Slot.Add(slot);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest();
+            }
+
+            return CreatedAtAction("GetSlot", slot);
+        }
+
+        // PUT: api/Slots/
+        [HttpPut]
+        public async Task<IActionResult> PutSlot(Slot slot)
+        {
+            if (!SlotExists(slot.RoomID, slot.StartTime))
+            {
+                return NotFound();
+            }
+
+            _context.Entry(slot).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SlotExists(slot.RoomID, slot.StartTime))
+                {
+                    return NotFound();
+                }
+            }
+            catch (DbUpdateException)
+            {
+                if (SlotExists(slot.RoomID, slot.StartTime))
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        private bool SlotExists(string roomId, DateTime startTime)
+        {
+            return _context.Slot.Any(
+                sl => sl.RoomID.Equals(roomId.ToUpper()) && sl.StartTime.Date.Equals(startTime.Date)
+                                                         && sl.StartTime.Hour.Equals(startTime.Hour));
         }
     }
 }

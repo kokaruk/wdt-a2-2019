@@ -44,17 +44,16 @@ namespace WdtA2Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUi3();
+
+                app.UseHealthChecks("/ready");
             }
             else
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            app.UseSwagger();
-            app.UseSwaggerUi3();
-
-            app.UseHealthChecks("/ready");
 
             app.UseHttpsRedirection();
             app.UseMvc();
@@ -65,25 +64,19 @@ namespace WdtA2Api
         // https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-2.2&tabs=visual-studio%2Cvisual-studio-xml
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddMvc()
-                .AddJsonOptions(
-                    options =>
-                        {
-                            options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                            options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                        })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().AddJsonOptions(
+                options =>
+                    {
+                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // Register the Swagger services
             services.AddSwaggerDocument();
 
-            services.AddDbContext<WdtA2ApiContext>(options =>                    
-                        options
-                            .UseLazyLoadingProxies()
-                            .UseSqlServer(this.ConnectionString));
-           services.AddHealthChecks()
-               .AddDbContextCheck<WdtA2ApiContext>();
+            services.AddDbContext<WdtA2ApiContext>(
+                options => options.UseLazyLoadingProxies().UseSqlServer(this.ConnectionString));
+            services.AddHealthChecks().AddDbContextCheck<WdtA2ApiContext>();
         }
     }
 }
