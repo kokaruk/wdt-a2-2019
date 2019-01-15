@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using WdtA2Api.Models;
 
 namespace WdtA2Api.Controllers
@@ -27,27 +28,35 @@ namespace WdtA2Api.Controllers
             return await _context.Slot.ToListAsync();
         }
 
-        // GET: api/Slots/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Slot>> GetSlot(string id)
+        // POST: api/Slots
+        [HttpPost]
+        public async Task<ActionResult<Slot>> PostSlot(Slot slot)
         {
-            var slot = await _context.Slot.FindAsync(id);
-
-            if (slot == null)
-            {
-                return NotFound();
-            }
-
-            return slot;
-        }
-
-        // PUT: api/Slots/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSlot(string id, Slot slot)
-        {
-            if (id != slot.RoomID)
+            if (SlotExists(slot.RoomID, slot.StartTime))
             {
                 return BadRequest();
+            }
+
+            _context.Slot.Add(slot);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return BadRequest();
+            }
+
+            return CreatedAtAction("GetSlot", slot);
+        }
+
+        // PUT: api/Slots/
+        [HttpPut]
+        public async Task<IActionResult> PutSlot(Slot slot)
+        {
+            if (!SlotExists(slot.RoomID, slot.StartTime))
+            {
+                return NotFound();
             }
 
             _context.Entry(slot).State = EntityState.Modified;
@@ -58,9 +67,16 @@ namespace WdtA2Api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SlotExists(id))
+                if (!SlotExists(slot.RoomID, slot.StartTime))
                 {
                     return NotFound();
+                }
+            }
+            catch (DbUpdateException)
+            {
+                if (SlotExists(slot.RoomID, slot.StartTime))
+                {
+                    return BadRequest();
                 }
                 else
                 {
@@ -71,21 +87,34 @@ namespace WdtA2Api.Controllers
             return NoContent();
         }
 
-        // POST: api/Slots
-        [HttpPost]
-        public async Task<ActionResult<Slot>> PostSlot(Slot slot)
+        // GET: api/Slots/5/2019-01-15T13:00
+        [HttpGet("{RoomID}/{StartTime}")]
+        public async Task<ActionResult<Slot>> GetSlot(string roomId, DateTime startTime)
         {
-            _context.Slot.Add(slot);
-            await _context.SaveChangesAsync();
+            var slot = await _context.Slot.FirstOrDefaultAsync(
+                           sl => sl.RoomID.Equals(roomId.ToUpper()) && sl.StartTime.Date.Equals(startTime.Date)
+                                                                    && sl.StartTime.Hour.Equals(startTime.Hour));
 
-            return CreatedAtAction("GetSlot", new { id = slot.RoomID }, slot);
+            if (slot == null)
+            {
+                return NotFound();
+            }
+
+            return slot;
         }
 
-        // DELETE: api/Slots/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Slot>> DeleteSlot(string id)
+        // DELETE: api/Slots/5/2019-01-15T13:00
+        [HttpDelete("{RoomID}/{StartTime}")]
+        public async Task<ActionResult<Slot>> DeleteSlot(string roomId, DateTime startTime)
         {
-            var slot = await _context.Slot.FindAsync(id);
+            if (!SlotExists(roomId, startTime))
+            {
+                return BadRequest();
+            }
+
+            var slot = await _context.Slot.FirstOrDefaultAsync(
+                           sl => sl.RoomID.Equals(roomId.ToUpper()) && sl.StartTime.Date.Equals(startTime.Date)
+                                                                    && sl.StartTime.Hour.Equals(startTime.Hour));
             if (slot == null)
             {
                 return NotFound();
@@ -97,9 +126,11 @@ namespace WdtA2Api.Controllers
             return slot;
         }
 
-        private bool SlotExists(string id)
+        private bool SlotExists(string roomId, DateTime startTime)
         {
-            return _context.Slot.Any(e => e.RoomID == id);
+            return _context.Slot.Any(
+                sl => sl.RoomID.Equals(roomId.ToUpper()) && sl.StartTime.Date.Equals(startTime.Date)
+                                                         && sl.StartTime.Hour.Equals(startTime.Hour));
         }
     }
 }
