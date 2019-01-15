@@ -21,44 +21,11 @@ namespace WdtA2Api.Controllers
             _context = context;
         }
 
-        /* // DELETE: api/Slots/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Slot>> DeleteSlot(string id)
-        {
-            var slot = await _context.Slot.FindAsync(id);
-            if (slot == null)
-            {
-                return NotFound();
-            }
-
-            _context.Slot.Remove(slot);
-            await _context.SaveChangesAsync();
-
-            return slot;
-        } */
-
         // GET: api/Slots
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Slot>>> GetSlot()
         {
             return await _context.Slot.ToListAsync();
-        }
-
-        // GET: api/Slots/5/2019-01-15T13:00
-        [Route("{RoomID}/{StartTime:datetime}")]
-        [HttpGet("{RoomID}/{StartTime}")]
-        public async Task<ActionResult<Slot>> GetSlot(string roomId, DateTime startTime)
-        {
-            var slot = await _context.Slot.FirstOrDefaultAsync(
-                           sl => sl.RoomID.Equals(roomId.ToUpper()) && sl.StartTime.Date.Equals(startTime.Date)
-                                                                    && sl.StartTime.Hour.Equals(startTime.Hour));
-
-            if (slot == null)
-            {
-                return NotFound();
-            }
-
-            return slot;
         }
 
         // POST: api/Slots
@@ -118,6 +85,45 @@ namespace WdtA2Api.Controllers
             }
 
             return NoContent();
+        }
+
+        // GET: api/Slots/5/2019-01-15T13:00
+        [HttpGet("{RoomID}/{StartTime}")]
+        public async Task<ActionResult<Slot>> GetSlot(string roomId, DateTime startTime)
+        {
+            var slot = await _context.Slot.FirstOrDefaultAsync(
+                           sl => sl.RoomID.Equals(roomId.ToUpper()) && sl.StartTime.Date.Equals(startTime.Date)
+                                                                    && sl.StartTime.Hour.Equals(startTime.Hour));
+
+            if (slot == null)
+            {
+                return NotFound();
+            }
+
+            return slot;
+        }
+
+        // DELETE: api/Slots/5/2019-01-15T13:00
+        [HttpDelete("{RoomID}/{StartTime}")]
+        public async Task<ActionResult<Slot>> DeleteSlot(string roomId, DateTime startTime)
+        {
+            if (!SlotExists(roomId, startTime))
+            {
+                return BadRequest();
+            }
+
+            var slot = await _context.Slot.FirstOrDefaultAsync(
+                           sl => sl.RoomID.Equals(roomId.ToUpper()) && sl.StartTime.Date.Equals(startTime.Date)
+                                                                    && sl.StartTime.Hour.Equals(startTime.Hour));
+            if (slot == null)
+            {
+                return NotFound();
+            }
+
+            _context.Slot.Remove(slot);
+            await _context.SaveChangesAsync();
+
+            return slot;
         }
 
         private bool SlotExists(string roomId, DateTime startTime)
