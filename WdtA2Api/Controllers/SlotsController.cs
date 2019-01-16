@@ -34,7 +34,7 @@ namespace WdtA2Api.Controllers
         {
             if (SlotExists(slot.RoomID, slot.StartTime))
             {
-                return BadRequest();
+                return BadRequest("slot already exists");
             }
 
             _context.Slot.Add(slot);
@@ -97,7 +97,7 @@ namespace WdtA2Api.Controllers
 
             if (slot == null)
             {
-                return NotFound();
+                return NotFound($"No slot fount for room: \"{roomId.ToUpper()}\" at {startTime:d-MM-yyy h tt}");
             }
 
             return slot;
@@ -109,7 +109,7 @@ namespace WdtA2Api.Controllers
         {
             if (!SlotExists(roomId, startTime))
             {
-                return BadRequest();
+                return BadRequest($"No slot fount for room: \"{roomId.ToUpper()}\" at {startTime:d-MM-yyy h tt}");
             }
 
             var slot = await _context.Slot.FirstOrDefaultAsync(
@@ -117,7 +117,12 @@ namespace WdtA2Api.Controllers
                                                                     && sl.StartTime.Hour.Equals(startTime.Hour));
             if (slot == null)
             {
-                return NotFound();
+                return NotFound($"No slot fount for room: \"{roomId.ToUpper()}\" at {startTime:d-MM-yyy h tt}");
+            }
+
+            if (slot.Student != null)
+            {
+                return BadRequest($"slot has assigned student, can't delete");
             }
 
             _context.Slot.Remove(slot);
