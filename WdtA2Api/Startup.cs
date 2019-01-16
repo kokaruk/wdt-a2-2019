@@ -25,12 +25,22 @@ namespace WdtA2Api
             this._connectionString = new Lazy<string>(
                 () =>
                     {
-                        var secrets = this.Configuration.GetSection(nameof(DbSecrets)).Get<DbSecrets>();
-                        var sqlString = new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"))
-                                            {
-                                                UserID = secrets.Uid, Password = secrets.Password
-                                            };
-                        return sqlString.ConnectionString;
+                        try
+                        {
+                            var secrets = this.Configuration.GetSection(nameof(DbSecrets)).Get<DbSecrets>();
+                            var sqlString = new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"))
+                                                {
+                                                    UserID = secrets.Uid,
+                                                    Password = secrets.Password
+                                                };
+                            return sqlString.ConnectionString;
+                        }
+                        catch (Exception)
+                        {
+                            var sqlString =
+                                new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"));
+                            return sqlString.ConnectionString;
+                        }
                     });
         }
 
@@ -46,14 +56,15 @@ namespace WdtA2Api
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUi3();
-
-                app.UseHealthChecks("/ready");
             }
-            else
+            if (env.IsProduction() || env.IsStaging() || env.IsEnvironment("Staging_2"))
             {
+                app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseHealthChecks("/ready");
 
             app.UseHttpsRedirection();
             app.UseMvc();
