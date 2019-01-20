@@ -6,3 +6,10 @@ services:
     build:
       context: .
       dockerfile: WdtA2Api/Dockerfile
+
+  wdtconsumer:
+    image: ${DOCKER_REGISTRY-}wdtconsumer
+    build:
+      context: .
+      dockerfile: WdtConsumer/Dockerfile
+
