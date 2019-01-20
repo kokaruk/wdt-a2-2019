@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WdtA2Api", "WdtA2Api\WdtA2A
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{9A1F7B6C-4D51-4FD2-ADD7-6BF1CDB473A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WdtConsumer", "WdtConsumer\WdtConsumer.csproj", "{586EBA58-1029-4AA1-B50C-A094F9D4851D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WdtConsumer", "WdtConsumer\WdtConsumer.csproj", "{586EBA58-1029-4AA1-B50C-A094F9D4851D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

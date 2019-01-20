@@ -26,7 +26,7 @@ namespace WdtConsumer.Controllers
             {
                 var result = await client.GetStringAsync("http://kokaruk.com:59560/api/rooms");
 
-                //var customers = JsonConvert.DeserializeObject<List<Customer>>(result);
+                //var customers = JsonConvert.DeserializeObject<List<Room>>(result);
                 return View();
             }
         }

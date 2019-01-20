@@ -13,6 +13,9 @@ using Newtonsoft.Json;
 using WdtA2Api.Models;
 using WdtA2Api.Utils;
 
+[assembly: ApiController]
+[assembly: ApiConventionType(typeof(DefaultApiConventions))]
+
 namespace WdtA2Api
 {
     public class Startup
@@ -76,12 +79,13 @@ namespace WdtA2Api
         // https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-2.2&tabs=visual-studio%2Cvisual-studio-xml
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().AddJsonOptions(
-                options =>
+            services.AddMvc()
+                .AddJsonOptions(options =>
                     {
                         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                    })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // Register the Swagger services
             services.AddSwaggerDocument();
