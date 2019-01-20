@@ -9,8 +9,6 @@ using Microsoft.Extensions.Logging;
 using WdtA2Api.Data;
 using WdtA2Api.Models;
 
-[assembly: ApiConventionType(typeof(DefaultApiConventions))]
-
 namespace WdtA2Api
 {
     public class Program
