@@ -14,21 +14,10 @@ namespace WdtConsumer.Controllers
 {
     public class HomeController : Controller
     {
-        // public IActionResult Index()
-        // {
-        //
-        //     return View();
-        // }
-
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            using (var client = new HttpClient())
-            {
-                var result = await client.GetStringAsync("http://kokaruk.com:59560/api/rooms");
-
-                //var customers = JsonConvert.DeserializeObject<List<Room>>(result);
-                return View();
-            }
+        
+            return View();
         }
 
         public IActionResult Privacy()
