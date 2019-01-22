@@ -3,20 +3,18 @@ using System.Data.SqlClient;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using Newtonsoft.Json;
+using WdtApiConsumer.Data;
+using WdtApiConsumer.Utils;
 
-using WdtA2Api.Models;
-using WdtA2Api.Utils;
-
-[assembly: ApiController]
-[assembly: ApiConventionType(typeof(DefaultApiConventions))]
-
-namespace WdtA2Api
+namespace WdtApiConsumer
 {
     public class Startup
     {
@@ -40,8 +38,8 @@ namespace WdtA2Api
                         }
                         catch (Exception)
                         {
-                            var sqlString =
-                                new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"));
+                            var sqlString = new SqlConnectionStringBuilder(
+                                this.Configuration.GetConnectionString("wdtA2Production"));
                             return sqlString.ConnectionString;
                         }
                     });
@@ -57,51 +55,41 @@ namespace WdtA2Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUi3();
+                app.UseDatabaseErrorPage();
             }
-
-            if (env.IsProduction() || env.IsStaging() || env.IsEnvironment("Staging_2"))
+            else
             {
-                app.UseExceptionHandler("/Error");
+                app.UseExceptionHandler("/Home/Error");
 
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
-            app.UseHealthChecks("/ready");
-
-            // Shows UseCors with CorsPolicyBuilder.
-            app.UseCors(builder =>
-                builder.WithOrigins("https://kokaruk.com")
-                    .AllowAnyHeader()
-                    .AllowAnyOrigin());
-
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseStaticFiles();
+            app.UseCookiePolicy();
+
+            app.UseAuthentication();
+
+            app.UseMvc(routes => { routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"); });
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        // using net core 2_2 features as per https://www.youtube.com/watch?v=_vw3hcnSA1Y&t=420s
-        // https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-2.2&tabs=visual-studio%2Cvisual-studio-xml
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().AddJsonOptions(
+            services.Configure<CookiePolicyOptions>(
                 options =>
                     {
-                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                        // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                        options.CheckConsentNeeded = context => true;
+                        options.MinimumSameSitePolicy = SameSiteMode.None;
+                    });
 
-            // Register the Swagger services
-            services.AddSwaggerDocument();
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(this.ConnectionString));
+            services.AddDefaultIdentity<IdentityUser>().AddDefaultUI(UIFramework.Bootstrap4)
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            //add CORS support
-            services.AddCors();
-
-            services.AddDbContext<WdtA2ApiContext>(
-                options => options.UseLazyLoadingProxies().UseSqlServer(this.ConnectionString));
-            services.AddHealthChecks().AddDbContextCheck<WdtA2ApiContext>();
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
     }
 }
