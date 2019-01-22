@@ -1,6 +1,6 @@
 using System;
 
-namespace AsrApp.Models
+namespace WdtAsrConsumer.Models
 {
     public class ErrorViewModel
     {

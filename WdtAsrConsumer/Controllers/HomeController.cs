@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using AsrApp.Models;
+using WdtAsrConsumer.Models;
 
-namespace AsrApp.Controllers
+namespace WdtAsrConsumer.Controllers
 {
     public class HomeController : Controller
     {

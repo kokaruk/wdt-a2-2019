@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Threading.Tasks;
 
 using AsrApp.Utils;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +13,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AsrApp
+using WdtAsrConsumer.Data;
+
+namespace WdtAsrConsumer
 {
     public class Startup
     {
@@ -28,25 +26,24 @@ namespace AsrApp
             this.Configuration = configuration;
             this._connectionString = new Lazy<string>(
                 () =>
-                {
-                    try
                     {
-                        var secrets = this.Configuration.GetSection(nameof(DbSecrets)).Get<DbSecrets>();
-                        var sqlString =
-                            new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"))
-                            {
-                                UserID = secrets.Uid,
-                                Password = secrets.Password
-                            };
-                        return sqlString.ConnectionString;
-                    }
-                    catch (Exception)
-                    {
-                        var sqlString = new SqlConnectionStringBuilder(
-                            this.Configuration.GetConnectionString("wdtA2Production"));
-                        return sqlString.ConnectionString;
-                    }
-                });
+                        try
+                        {
+                            var secrets = this.Configuration.GetSection(nameof(DbSecrets)).Get<DbSecrets>();
+                            var sqlString =
+                                new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"))
+                                    {
+                                        UserID = secrets.Uid, Password = secrets.Password
+                                    };
+                            return sqlString.ConnectionString;
+                        }
+                        catch (Exception)
+                        {
+                            var sqlString = new SqlConnectionStringBuilder(
+                                this.Configuration.GetConnectionString("wdtA2Production"));
+                            return sqlString.ConnectionString;
+                        }
+                    });
         }
 
         public IConfiguration Configuration { get; }
@@ -83,15 +80,15 @@ namespace AsrApp
         {
             services.Configure<CookiePolicyOptions>(
                 options =>
-                {
-                    // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                    options.CheckConsentNeeded = context => true;
-                    options.MinimumSameSitePolicy = SameSiteMode.None;
-                });
+                    {
+                        // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                        options.CheckConsentNeeded = context => true;
+                        options.MinimumSameSitePolicy = SameSiteMode.None;
+                    });
 
-            // services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(this.ConnectionString));
-            // services.AddDefaultIdentity<IdentityUser>().AddDefaultUI(UIFramework.Bootstrap4)
-            //     .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(this.ConnectionString));
+            services.AddDefaultIdentity<IdentityUser>().AddDefaultUI(UIFramework.Bootstrap4)
+                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
