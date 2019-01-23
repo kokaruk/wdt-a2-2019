@@ -29,8 +29,31 @@ namespace WdtApiLogin.Areas.Identity
                         services.AddDbContext<WdtApiLoginContext>(
                             options => options.UseSqlServer(connString));
 
-                        services.AddDefaultIdentity<WdtApiLoginUser>().AddDefaultUI(UIFramework.Bootstrap4)
-                            .AddEntityFrameworkStores<WdtApiLoginContext>();
+                        services.AddIdentity<WdtApiLoginUser, IdentityRole>()
+                            .AddDefaultUI(UIFramework.Bootstrap4)
+                            .AddEntityFrameworkStores<WdtApiLoginContext>()
+                            .AddDefaultTokenProviders(); ;
+
+                        services.Configure<IdentityOptions>(options =>
+                            {
+                                // Password settings.
+                                options.Password.RequireDigit = true;
+                                options.Password.RequireLowercase = 
+                                options.Password.RequireNonAlphanumeric =
+                                options.Password.RequireUppercase = false;
+                                options.Password.RequiredLength = 6;
+                                options.Password.RequiredUniqueChars = 1;
+
+                                // Lockout settings.
+                                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                                options.Lockout.MaxFailedAccessAttempts = 5;
+                                options.Lockout.AllowedForNewUsers = true;
+
+                                // User settings.
+                                options.User.AllowedUserNameCharacters =
+                                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                                options.User.RequireUniqueEmail = true;
+                            });
                     });
         }
     }
