@@ -37,21 +37,21 @@ namespace WdtApiLogin.Areas.Identity
                         services.Configure<IdentityOptions>(options =>
                             {
                                 // Password settings.
-                                options.Password.RequireDigit = true;
+                                options.Password.RequireDigit = 
                                 options.Password.RequireLowercase = 
                                 options.Password.RequireNonAlphanumeric =
                                 options.Password.RequireUppercase = false;
-                                options.Password.RequiredLength = 6;
+                                options.Password.RequiredLength = 2;
                                 options.Password.RequiredUniqueChars = 1;
 
                                 // Lockout settings.
                                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
                                 options.Lockout.MaxFailedAccessAttempts = 5;
-                                options.Lockout.AllowedForNewUsers = true;
+                                options.Lockout.AllowedForNewUsers = false;
 
                                 // User settings.
                                 options.User.AllowedUserNameCharacters =
-                                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+                                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
                                 options.User.RequireUniqueEmail = true;
                             });
                     });

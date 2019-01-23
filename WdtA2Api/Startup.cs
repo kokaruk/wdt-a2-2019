@@ -73,7 +73,8 @@ namespace WdtA2Api
 
             // Shows UseCors with CorsPolicyBuilder.
             app.UseCors(builder =>
-                builder.WithOrigins("https://kokaruk.com")
+                builder
+                    .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowAnyOrigin());
 
