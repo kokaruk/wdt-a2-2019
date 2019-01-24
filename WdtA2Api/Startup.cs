@@ -31,11 +31,11 @@ namespace WdtA2Api
                         try
                         {
                             var secrets = this.Configuration.GetSection(nameof(DbSecrets)).Get<DbSecrets>();
-                            var sqlString = new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"))
-                                                {
-                                                    UserID = secrets.Uid,
-                                                    Password = secrets.Password
-                                                };
+                            var sqlString =
+                                new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"))
+                                    {
+                                        UserID = secrets.Uid, Password = secrets.Password
+                                    };
                             return sqlString.ConnectionString;
                         }
                         catch (Exception)
@@ -60,6 +60,7 @@ namespace WdtA2Api
                 app.UseSwagger();
                 app.UseSwaggerUi3();
             }
+
             if (env.IsProduction() || env.IsStaging() || env.IsEnvironment("Staging_2"))
             {
                 app.UseExceptionHandler("/Error");
@@ -70,6 +71,13 @@ namespace WdtA2Api
 
             app.UseHealthChecks("/ready");
 
+            // Shows UseCors with CorsPolicyBuilder.
+            app.UseCors(builder =>
+                builder
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowAnyOrigin());
+
             app.UseHttpsRedirection();
             app.UseMvc();
         }
@@ -79,16 +87,18 @@ namespace WdtA2Api
         // https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-2.2&tabs=visual-studio%2Cvisual-studio-xml
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
-                .AddJsonOptions(options =>
+            services.AddMvc().AddJsonOptions(
+                options =>
                     {
                         options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                    })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             // Register the Swagger services
             services.AddSwaggerDocument();
+
+            //add CORS support
+            services.AddCors();
 
             services.AddDbContext<WdtA2ApiContext>(
                 options => options.UseLazyLoadingProxies().UseSqlServer(this.ConnectionString));
