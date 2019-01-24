@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -29,6 +30,9 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
             _userManager = userManager;
             _logger = logger;
         }
+
+        [TempData]
+        public string GlobalStatusMessage { get; set; }
 
         [BindProperty]
         public InputModel Input { get; set; }
@@ -115,21 +119,36 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                var user = new WdtApiLoginUser { UserName = Input.Email, Email = Input.Email };
-                var result = await _userManager.CreateAsync(user);
-                if (result.Succeeded)
+
+                var regex = new Regex(@"^e\d{5}@rmit.edu.au$|^s\d{7}@student.rmit.edu.au$");
+
+                if (regex.IsMatch(Input.Email))
                 {
-                    result = await _userManager.AddLoginAsync(user, info);
+
+                    var userName = Regex.Match(Input.Email, @"^e\d{5}|^s\d{7}").Value;
+
+                    var user = new WdtApiLoginUser { UserName = userName, Email = Input.Email, Name = info.Principal.Identity.Name };
+                    var result = await _userManager.CreateAsync(user);
                     if (result.Succeeded)
                     {
-                        await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-                        return LocalRedirect(returnUrl);
+                        result = await _userManager.AddLoginAsync(user, info);
+                        if (result.Succeeded)
+                        {
+                            await _signInManager.SignInAsync(user, isPersistent: false);
+                            _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                            GlobalStatusMessage = "Successfully Created new user account!";
+                            return LocalRedirect(returnUrl);
+                        }
+                    }
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
                     }
                 }
-                foreach (var error in result.Errors)
+                else
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    ErrorMessage = "Your email is out of allowed scope";
+                    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
                 }
             }
 

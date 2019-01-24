@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Security.Claims;
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -47,6 +49,7 @@ namespace WdtApiLogin
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+            app.UseSession();
 
             app.UseMvc(routes => { routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"); });
         }
@@ -62,12 +65,26 @@ namespace WdtApiLogin
                         options.MinimumSameSitePolicy = SameSiteMode.None;
                     });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddRazorPagesOptions(
-                options =>
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddSessionStateTempDataProvider();
+
+            services.AddSession();
+
+            services.AddAuthentication().AddGoogle(
+                o =>
                     {
-                        options.AllowAreas = true;
-                        options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
-                        options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+                        o.ClientId = Configuration["Authentication:Google:ClientId"];
+                        o.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                        o.UserInformationEndpoint = "https://www.googleapis.com/oauth2/v2/userinfo";
+                        o.ClaimActions.Clear();
+                        o.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+                        o.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+                        o.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
+                        o.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
+                        o.ClaimActions.MapJsonKey("urn:google:profile", "link");
+                        o.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+                        o.ClaimActions.MapJsonKey("urn:google:image", "picture");
                     });
 
             services.ConfigureApplicationCookie(
@@ -77,11 +94,6 @@ namespace WdtApiLogin
                         options.Cookie.HttpOnly = true;
                         options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                         options.SlidingExpiration = true;
-
-
-                        options.LoginPath = "/Identity/Account/Login";
-                        options.LogoutPath = "/Identity/Account/Logout";
-                        options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                     });
         }
     }
