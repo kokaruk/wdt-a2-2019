@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace WdtApiLogin.Utils
+namespace WdtUtils.Model
 {
     /// <summary>
     /// user secrets accessor class

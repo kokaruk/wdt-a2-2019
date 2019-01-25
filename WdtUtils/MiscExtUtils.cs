@@ -3,9 +3,9 @@ using System.Data.SqlClient;
 
 using Microsoft.Extensions.Configuration;
 
-using WdtApiLogin.Utils.Model;
+using WdtUtils.Model;
 
-namespace WdtApiLogin.Utils
+namespace WdtUtils
 {
     public static class MiscExtUtils
     {

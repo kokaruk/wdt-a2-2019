@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using WdtApiLogin.Utils;
+using WdtApiLogin.Utils.Model;
 
 namespace WdtApiLogin
 {
@@ -57,6 +58,9 @@ namespace WdtApiLogin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.Configure<MyAppSettings>(this.Configuration.GetSection(nameof(MyAppSettings)));
+
             services.Configure<CookiePolicyOptions>(
                 options =>
                     {
@@ -71,6 +75,7 @@ namespace WdtApiLogin
 
             services.AddSession();
 
+            // https://github.com/aspnet/AspNetCore/issues/6069
             services.AddAuthentication().AddGoogle(
                 o =>
                     {

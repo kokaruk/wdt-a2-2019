@@ -1,7 +1,13 @@
-﻿@{
+﻿@model List<String>
+@{
     ViewData["Title"] = "Index";
 }
 
 <h2>Index</h2>
 
 <p>Hello from our View Template!</p>
+
+@foreach (var x in Model)
+{
+    <p>@x</p>
+}
