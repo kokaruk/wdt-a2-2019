@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-using WdtApiLogin.Utils.Model;
+using WdtUtils.Model;
 
 namespace WdtApiLogin.Controllers
 {

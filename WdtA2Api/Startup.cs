@@ -9,9 +9,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Newtonsoft.Json;
-
 using WdtA2Api.Models;
-using WdtA2Api.Utils;
+
+using WdtUtils;
+using WdtUtils.Model;
 
 [assembly: ApiController]
 [assembly: ApiConventionType(typeof(DefaultApiConventions))]
@@ -25,26 +26,7 @@ namespace WdtA2Api
         public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
-            this._connectionString = new Lazy<string>(
-                () =>
-                    {
-                        try
-                        {
-                            var secrets = this.Configuration.GetSection(nameof(DbSecrets)).Get<DbSecrets>();
-                            var sqlString =
-                                new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"))
-                                    {
-                                        UserID = secrets.Uid, Password = secrets.Password
-                                    };
-                            return sqlString.ConnectionString;
-                        }
-                        catch (Exception)
-                        {
-                            var sqlString =
-                                new SqlConnectionStringBuilder(this.Configuration.GetConnectionString("wdtA2"));
-                            return sqlString.ConnectionString;
-                        }
-                    });
+            this._connectionString = new Lazy<string>(() => Configuration.BuldConnectionString());
         }
 
         public IConfiguration Configuration { get; }

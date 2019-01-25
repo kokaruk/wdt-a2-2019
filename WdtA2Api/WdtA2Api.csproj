@@ -33,4 +33,8 @@
     <PackageReference Include="NSwag.AspNetCore" Version="12.0.12" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\WdtUtils\WdtUtils.csproj" />
+  </ItemGroup>
+
 </Project>

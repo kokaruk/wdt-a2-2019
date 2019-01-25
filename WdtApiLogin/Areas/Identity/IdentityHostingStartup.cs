@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using WdtApiLogin.Areas.Identity;
 using WdtApiLogin.Areas.Identity.Data;
 using WdtApiLogin.Models;
-using WdtApiLogin.Utils;
+using WdtUtils;
 
 [assembly: HostingStartup(typeof(IdentityHostingStartup))]
 
