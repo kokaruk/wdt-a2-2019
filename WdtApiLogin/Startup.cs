@@ -4,11 +4,15 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+
+using WdtApiLogin.Areas.Identity.Data;
+using WdtApiLogin.Repo;
+
 using WdtUtils;
-using WdtUtils.Model;
 
 namespace WdtApiLogin
 {
@@ -27,7 +31,7 @@ namespace WdtApiLogin
         private string ConnectionString => this._connectionString.Value;
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<WdtApiLoginUser> userManager)
         {
             if (env.IsDevelopment())
             {
@@ -47,6 +51,9 @@ namespace WdtApiLogin
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+
+            SeedData.SeedUsers(userManager);
+
             app.UseSession();
 
             app.UseMvc(routes => { routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"); });
@@ -55,8 +62,6 @@ namespace WdtApiLogin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
-            services.Configure<MyAppSettings>(this.Configuration.GetSection(nameof(MyAppSettings)));
 
             services.Configure<CookiePolicyOptions>(
                 options =>
@@ -97,6 +102,9 @@ namespace WdtApiLogin
                         options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                         options.SlidingExpiration = true;
                     });
+
+            services.AddHttpClient<IApiService, ApiService>(c => c.BaseAddress = new Uri(this.Configuration["WebApiUrl"]))
+                .SetHandlerLifetime(TimeSpan.FromMinutes(10)); 
         }
     }
 }

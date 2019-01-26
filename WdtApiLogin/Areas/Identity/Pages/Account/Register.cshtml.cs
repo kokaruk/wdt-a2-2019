@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -10,6 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using WdtApiLogin.Areas.Identity.Data;
+using WdtApiLogin.Repo;
+
+using WdtModels.ApiModels;
 
 namespace WdtApiLogin.Areas.Identity.Pages.Account
 {
@@ -20,17 +24,20 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
         private readonly UserManager<WdtApiLoginUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IApiService _apiService;
 
         public RegisterModel(
             UserManager<WdtApiLoginUser> userManager,
             SignInManager<WdtApiLoginUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IApiService apiService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            this._apiService = apiService;
         }
 
         [TempData]
@@ -88,6 +95,22 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
+                try
+                {
+                    var apiUser = await this._apiService.Users.FindAsync(u => u.UserID == Input.UserName);
+                    if (apiUser != null)
+                    {
+                        GlobalStatusMessage = "Error. User Already Exists";
+                        ModelState.AddModelError(string.Empty, "Error. User Already Exists");
+                        // return this.RedirectToPage();
+                        return Page();
+                    }
+                }
+                catch (HttpRequestException)
+                {
+                    // exception caught, user doesn't exist
+                }
+                
                 var user = new WdtApiLoginUser
                                {
                                    UserName = Input.UserName,
@@ -95,14 +118,30 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                                                                ? Input.UserName + "@student.rmit.edu.au" 
                                                                : Input.UserName + "@rmit.edu.au",
                                                    Name = Input.Name.Trim()
-                               };   
+                               };
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation("User created a new account with password.");
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    GlobalStatusMessage = "Successfully Created new user account!";
+                    try
+                    {
+                        var apiUser = new User { Email = user.Email, Name = user.Name, UserID = user.UserName };
+                        var response = await this._apiService.Users.AddAsync(apiUser);
+                    }
+                    catch (HttpRequestException)
+                    {
+                        // exception caught can't ceate user for some reason
+                        var deleteResult = await this._userManager.DeleteAsync(user);
+                    }
+                    finally
+                    {
+                        _logger.LogInformation("User created a new account with password.");
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        GlobalStatusMessage = "Successfully Created new user account!";
+                    }
+
                     return LocalRedirect(returnUrl);
+
                 }
                 foreach (var error in result.Errors)
                 {

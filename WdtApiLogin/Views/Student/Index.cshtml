@@ -1,13 +1,11 @@
-﻿@model List<String>
+﻿@model IEnumerable<WdtModels.ApiModels.User>
 @{
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
-
-<p>Hello from our View Template!</p>
+<p>@ViewBag.User.Email</p>
 
 @foreach (var x in Model)
 {
-    <p>@x</p>
+    <p>@x.Name</p>
 }

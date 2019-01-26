@@ -5,24 +5,26 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-using WdtUtils.Model;
+using WdtApiLogin.Repo;
+
+using WdtModels.ApiModels;
 
 namespace WdtApiLogin.Controllers
 {
     public class StudentController : Controller
     {
-        private readonly IOptions<MyAppSettings> _appSettings;
+        private readonly IApiService _apiService;
 
-        public StudentController(IOptions<MyAppSettings> appSettings)
+        public StudentController(IApiService apiService) => this._apiService = apiService;
+        
+        public async Task<IActionResult> Index()
         {
-            this._appSettings = appSettings;
-        }
+            var users = await this._apiService.Users.GetAllAsync();
 
-        public IActionResult Index()
-        {
-            var list = new List<string> { "John", "Alex", this._appSettings.Value.WebApiUrl };
+            var user = await this._apiService.Users.GetAsync("e12345");
+            ViewBag.User = user;
 
-            return View(list);
+            return View(users);
         }
     }
 }

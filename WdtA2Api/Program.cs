@@ -7,7 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using WdtA2Api.Data;
-using WdtA2Api.Models;
+
+[assembly: ApiController]
+[assembly: ApiConventionType(typeof(DefaultApiConventions))]
 
 namespace WdtA2Api
 {

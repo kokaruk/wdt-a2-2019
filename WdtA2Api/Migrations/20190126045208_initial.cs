@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WdtA2Api.Migrations
@@ -7,6 +8,17 @@ namespace WdtA2Api.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "AccessLevels",
+                columns: table => new
+                {
+                    Name = table.Column<string>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccessLevels", x => x.Name);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Room",
                 columns: table => new
@@ -29,6 +41,27 @@ namespace WdtA2Api.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_User", x => x.UserID);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Faq",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Question = table.Column<string>(nullable: false),
+                    Answer = table.Column<string>(nullable: false),
+                    AccessLevel = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Faq", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Faq_AccessLevels_AccessLevel",
+                        column: x => x.AccessLevel,
+                        principalTable: "AccessLevels",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -64,6 +97,11 @@ namespace WdtA2Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Faq_AccessLevel",
+                table: "Faq",
+                column: "AccessLevel");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Slot_StaffID",
                 table: "Slot",
                 column: "StaffID");
@@ -77,7 +115,13 @@ namespace WdtA2Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Faq");
+
+            migrationBuilder.DropTable(
                 name: "Slot");
+
+            migrationBuilder.DropTable(
+                name: "AccessLevels");
 
             migrationBuilder.DropTable(
                 name: "Room");

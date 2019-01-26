@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WdtA2Api.Models;
+
+using WdtA2Api.Data;
+using WdtModels.ApiModels;
 
 namespace WdtA2Api.Controllers
 {

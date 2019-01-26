@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,13 +8,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Newtonsoft.Json;
-using WdtA2Api.Models;
 
+using NSwag.AspNetCore;
+
+using WdtA2Api.Data;
 using WdtUtils;
-using WdtUtils.Model;
-
-[assembly: ApiController]
-[assembly: ApiConventionType(typeof(DefaultApiConventions))]
 
 namespace WdtA2Api
 {
@@ -52,6 +49,7 @@ namespace WdtA2Api
             }
 
             app.UseHealthChecks("/ready");
+            
 
             // Shows UseCors with CorsPolicyBuilder.
             app.UseCors(builder =>
@@ -83,7 +81,11 @@ namespace WdtA2Api
             services.AddCors();
 
             services.AddDbContext<WdtA2ApiContext>(
-                options => options.UseLazyLoadingProxies().UseSqlServer(this.ConnectionString));
+                options => options
+                    .UseLazyLoadingProxies()
+                    .UseSqlServer(
+                        this.ConnectionString,
+                        opt => opt.EnableRetryOnFailure()));
             services.AddHealthChecks().AddDbContextCheck<WdtA2ApiContext>();
         }
     }
