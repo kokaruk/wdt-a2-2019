@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -9,8 +11,11 @@ using WdtApiLogin.Repo;
 
 using WdtModels.ApiModels;
 
+using WdtUtils.Model;
+
 namespace WdtApiLogin.Controllers
 {
+    [Authorize(Roles = UserConstants.Student)]
     public class StudentController : Controller
     {
         private readonly IApiService _apiService;

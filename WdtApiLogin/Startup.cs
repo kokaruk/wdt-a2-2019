@@ -14,6 +14,7 @@ using WdtApiLogin.Areas.Identity.Data;
 using WdtApiLogin.Repo;
 
 using WdtUtils;
+using WdtUtils.Model;
 
 namespace WdtApiLogin
 {
@@ -24,7 +25,7 @@ namespace WdtApiLogin
         public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
-            this._connectionString = new Lazy<string>(configuration.BuldConnectionString());
+            this._connectionString = new Lazy<string>(configuration.BuildConnectionString());
         }
 
         public IConfiguration Configuration { get; }
@@ -57,8 +58,6 @@ namespace WdtApiLogin
             app.UseCookiePolicy();
 
             app.UseAuthentication();
-
-            SeedData.SeedUsers(userManager);
 
             app.UseSession();
 
@@ -93,6 +92,12 @@ namespace WdtApiLogin
                         var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
                         config.Filters.Add(new AuthorizeFilter(policy));
                     }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddSessionStateTempDataProvider();
+
+            services.AddAuthorization(options =>
+                {
+                    options.AddPolicy("RequireStudentRole", policy => policy.RequireRole(UserConstants.Student));
+                    options.AddPolicy("RequireStaffRole", policy => policy.RequireRole(UserConstants.Staff));
+                });
 
             services.AddSession();
 

@@ -9,4 +9,11 @@ namespace WdtUtils.Model
         [StringValue("Staff")]
         Staff
     }
+
+    public static class UserConstants
+    {
+        public const string Student = "Student";
+        public const string Staff = "Staff";
+    }
+
 }

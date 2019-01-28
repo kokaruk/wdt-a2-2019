@@ -1,4 +1,9 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Identity
+@using WdtApiLogin.Areas.Identity.Data
+@inject SignInManager<WdtApiLoginUser> SignInManager
+@inject UserManager<WdtApiLoginUser> UserManager
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -11,7 +16,6 @@
             <h1 class="display-3 font-size-md-down-5 text-white">Online Bookings</h1>
             <p class="lead text-white">Empower users to create their own bookings</p>
         </div>
-
     </div>
 </div>
 
@@ -181,3 +185,12 @@
         </div>
     </div>
 </section>
+
+<div class="d-lg-flex align-items-lg-center position-relative">
+    <div class="container">
+        <div class="w-lg-80 text-center mx-auto">
+            <p class="lead text-muted text-sm-center small">For proof of concept only. Links to restricted pages visible for anonymous users</p>
+            <p class="lead text-muted text-sm-center small"><a class="lead text-muted text-sm-center small" asp-area="" asp-controller="Staff" asp-action="Index">Staff</a> | <a class="lead text-muted text-sm-center small" asp-area="" asp-controller="Student" asp-action="Index">Student</a></p>
+        </div>
+    </div>
+</div>

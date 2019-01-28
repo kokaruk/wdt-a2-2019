@@ -26,7 +26,7 @@ namespace WdtApiLogin.Areas.Identity
             builder.ConfigureServices(
                 (context, services) =>
                     {
-                        var connString = context.Configuration.BuldConnectionString();
+                        var connString = context.Configuration.BuildConnectionString();
 
                         services.AddDbContext<WdtApiLoginContext>(
                             options => options.UseSqlServer(connString));

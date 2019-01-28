@@ -16,6 +16,8 @@ using WdtApiLogin.Repo;
 
 using WdtModels.ApiModels;
 
+using WdtUtils;
+
 namespace WdtApiLogin.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
@@ -152,6 +154,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                                 {
                                     apiUser = new User { Email = user.Email, Name = user.Name, UserID = user.UserName };
                                     var response = await this._apiService.Users.AddAsync(apiUser);
+                                    await _userManager.AddToRoleAsync(user, user.Email.GetUserRoleFromUserName());
                                 }
                                 await _signInManager.SignInAsync(user, isPersistent: false);
                                 _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);

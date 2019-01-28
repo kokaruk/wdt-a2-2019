@@ -25,7 +25,7 @@ namespace WdtA2Api
         public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
-            this._connectionString = new Lazy<string>(() => Configuration.BuldConnectionString());
+            this._connectionString = new Lazy<string>(() => Configuration.BuildConnectionString());
         }
 
         public IConfiguration Configuration { get; }

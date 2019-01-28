@@ -9,7 +9,10 @@ namespace WdtUtils
 {
     public static class MiscExtUtils
     {
-        public static string BuldConnectionString(this IConfiguration value)
+
+        public static string GetUserRoleFromUserName(this string value) => value.StartsWith('e') ? UserConstants.Staff : UserConstants.Student;
+
+        public static string BuildConnectionString(this IConfiguration value)
         {
             try
             {
