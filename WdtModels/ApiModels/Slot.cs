@@ -1,10 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 using Newtonsoft.Json;
 
-namespace WdtA2Api.Models
+namespace WdtModels.ApiModels
 {
     public class Slot
     {
@@ -19,6 +18,7 @@ namespace WdtA2Api.Models
         public string StaffID { get; set; }
 
         public DateTime StartTime { get; set; }
+
         public virtual User Student { get; set; }
 
         [ForeignKey("User"), Column("BookedInStudentID")]

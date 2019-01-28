@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data.SqlClient;
+using System.Security.Claims;
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
@@ -24,7 +26,7 @@ namespace WdtApiLogin.Areas.Identity
             builder.ConfigureServices(
                 (context, services) =>
                     {
-                        var connString = context.Configuration.BuldConnectionString();
+                        var connString = context.Configuration.BuildConnectionString();
 
                         services.AddDbContext<WdtApiLoginContext>(
                             options => options.UseSqlServer(connString));
@@ -32,7 +34,24 @@ namespace WdtApiLogin.Areas.Identity
                         services.AddIdentity<WdtApiLoginUser, IdentityRole>()
                             .AddDefaultUI(UIFramework.Bootstrap4)
                             .AddEntityFrameworkStores<WdtApiLoginContext>()
-                            .AddDefaultTokenProviders(); ;
+                            .AddDefaultTokenProviders();
+
+                        // https://github.com/aspnet/AspNetCore/issues/6069
+                        services.AddAuthentication().AddGoogle(
+                            o =>
+                                {
+                                    o.ClientId = context.Configuration["Authentication:Google:ClientId"];
+                                    o.ClientSecret = context.Configuration["Authentication:Google:ClientSecret"];
+                                    o.UserInformationEndpoint = "https://www.googleapis.com/oauth2/v2/userinfo";
+                                    o.ClaimActions.Clear();
+                                    o.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
+                                    o.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+                                    o.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
+                                    o.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
+                                    o.ClaimActions.MapJsonKey("urn:google:profile", "link");
+                                    o.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+                                    o.ClaimActions.MapJsonKey("urn:google:image", "picture");
+                                });
 
                         services.Configure<IdentityOptions>(options =>
                             {

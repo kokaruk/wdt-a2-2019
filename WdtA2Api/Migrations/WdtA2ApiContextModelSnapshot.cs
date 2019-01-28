@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using WdtA2Api.Models;
+using WdtA2Api.Data;
 
 namespace WdtA2Api.Migrations
 {
@@ -19,7 +19,41 @@ namespace WdtA2Api.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("WdtA2Api.Models.Room", b =>
+            modelBuilder.Entity("WdtModels.ApiModels.AccessLevel", b =>
+                {
+                    b.Property<string>("Name")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30);
+
+                    b.HasKey("Name");
+
+                    b.ToTable("AccessLevels");
+                });
+
+            modelBuilder.Entity("WdtModels.ApiModels.Faq", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AccessName")
+                        .HasColumnName("AccessLevel")
+                        .HasMaxLength(30);
+
+                    b.Property<string>("Answer")
+                        .IsRequired();
+
+                    b.Property<string>("Question")
+                        .IsRequired();
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccessName");
+
+                    b.ToTable("Faq");
+                });
+
+            modelBuilder.Entity("WdtModels.ApiModels.Room", b =>
                 {
                     b.Property<string>("RoomID")
                         .ValueGeneratedOnAdd()
@@ -30,7 +64,7 @@ namespace WdtA2Api.Migrations
                     b.ToTable("Room");
                 });
 
-            modelBuilder.Entity("WdtA2Api.Models.Slot", b =>
+            modelBuilder.Entity("WdtModels.ApiModels.Slot", b =>
                 {
                     b.Property<string>("RoomID");
 
@@ -51,7 +85,7 @@ namespace WdtA2Api.Migrations
                     b.ToTable("Slot");
                 });
 
-            modelBuilder.Entity("WdtA2Api.Models.User", b =>
+            modelBuilder.Entity("WdtModels.ApiModels.User", b =>
                 {
                     b.Property<string>("UserID")
                         .ValueGeneratedOnAdd()
@@ -68,19 +102,26 @@ namespace WdtA2Api.Migrations
                     b.ToTable("User");
                 });
 
-            modelBuilder.Entity("WdtA2Api.Models.Slot", b =>
+            modelBuilder.Entity("WdtModels.ApiModels.Faq", b =>
                 {
-                    b.HasOne("WdtA2Api.Models.Room", "Room")
+                    b.HasOne("WdtModels.ApiModels.AccessLevel", "Access")
+                        .WithMany()
+                        .HasForeignKey("AccessName");
+                });
+
+            modelBuilder.Entity("WdtModels.ApiModels.Slot", b =>
+                {
+                    b.HasOne("WdtModels.ApiModels.Room", "Room")
                         .WithMany("Slots")
                         .HasForeignKey("RoomID")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("WdtA2Api.Models.User", "Staff")
+                    b.HasOne("WdtModels.ApiModels.User", "Staff")
                         .WithMany()
                         .HasForeignKey("StaffID")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("WdtA2Api.Models.User", "Student")
+                    b.HasOne("WdtModels.ApiModels.User", "Student")
                         .WithMany()
                         .HasForeignKey("StudentID");
                 });

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -11,6 +12,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using WdtApiLogin.Areas.Identity.Data;
+using WdtApiLogin.Repo;
+
+using WdtModels.ApiModels;
+
+using WdtUtils;
 
 namespace WdtApiLogin.Areas.Identity.Pages.Account
 {
@@ -20,15 +26,18 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
         private readonly SignInManager<WdtApiLoginUser> _signInManager;
         private readonly UserManager<WdtApiLoginUser> _userManager;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly IApiService _apiService;
 
         public ExternalLoginModel(
             SignInManager<WdtApiLoginUser> signInManager,
             UserManager<WdtApiLoginUser> userManager,
-            ILogger<ExternalLoginModel> logger)
+            ILogger<ExternalLoginModel> logger,
+            IApiService apiService)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _logger = logger;
+            _apiService = apiService;
         }
 
         [TempData]
@@ -109,6 +118,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostConfirmationAsync(string returnUrl = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
+
             // Get the information about the user from the external login provider
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
@@ -124,7 +134,6 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
 
                 if (regex.IsMatch(Input.Email))
                 {
-
                     var userName = Regex.Match(Input.Email, @"^e\d{5}|^s\d{7}").Value;
 
                     var user = new WdtApiLoginUser { UserName = userName, Email = Input.Email, Name = info.Principal.Identity.Name };
@@ -134,12 +143,37 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                         result = await _userManager.AddLoginAsync(user, info);
                         if (result.Succeeded)
                         {
-                            await _signInManager.SignInAsync(user, isPersistent: false);
-                            _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
-                            GlobalStatusMessage = "Successfully Created new user account!";
-                            return LocalRedirect(returnUrl);
+                            /*
+                             * begin inject code
+                             * need to check if user exists in outer data storage
+                             */
+                            try
+                            {
+                                var apiUser = await this._apiService.Users.FindAsync(u => u.UserID == userName);
+                                if (apiUser == null)
+                                {
+                                    apiUser = new User { Email = user.Email, Name = user.Name, UserID = user.UserName };
+                                    var response = await this._apiService.Users.AddAsync(apiUser);
+                                    await _userManager.AddToRoleAsync(user, user.Email.GetUserRoleFromUserName());
+                                }
+                                await _signInManager.SignInAsync(user, isPersistent: false);
+                                _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                                GlobalStatusMessage = "Successfully Created new user account!";
+                                return LocalRedirect(returnUrl);
+                            }
+                            catch (HttpRequestException)
+                            {
+                                // exception caught can't create user for some reason
+                                var deleteResult = await this._userManager.DeleteAsync(user);
+                                GlobalStatusMessage = "Error. User Already Exists";
+                                ModelState.AddModelError(string.Empty, "Error. User Already Exists");
+
+                                // return this.RedirectToPage();
+                                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                            }
                         }
                     }
+
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);

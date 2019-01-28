@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WdtModels.ApiModels;
 
-namespace WdtA2Api.Models
+namespace WdtA2Api.Data
 {
     public class WdtA2ApiContext : DbContext
     {
@@ -14,6 +15,11 @@ namespace WdtA2Api.Models
         public DbSet<Slot> Slot { get; set; }
 
         public DbSet<User> User { get; set; }
+
+        public DbSet<AccessLevel> AccessLevels { get; set; }
+         
+        public DbSet<Faq> Faq { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

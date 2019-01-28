@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Linq;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Newtonsoft.Json;
-using WdtA2Api.Models;
 
+using NSwag.AspNetCore;
+
+using WdtA2Api.Data;
 using WdtUtils;
-using WdtUtils.Model;
-
-[assembly: ApiController]
-[assembly: ApiConventionType(typeof(DefaultApiConventions))]
 
 namespace WdtA2Api
 {
@@ -26,7 +25,7 @@ namespace WdtA2Api
         public Startup(IConfiguration configuration)
         {
             this.Configuration = configuration;
-            this._connectionString = new Lazy<string>(() => Configuration.BuldConnectionString());
+            this._connectionString = new Lazy<string>(() => Configuration.BuildConnectionString());
         }
 
         public IConfiguration Configuration { get; }
@@ -39,8 +38,6 @@ namespace WdtA2Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUi3();
             }
 
             if (env.IsProduction() || env.IsStaging() || env.IsEnvironment("Staging_2"))
@@ -51,7 +48,23 @@ namespace WdtA2Api
                 app.UseHsts();
             }
 
+            app.UseSwagger(config =>
+            {
+                config.Path = "/swagger/v1/swagger.json";
+                config.PostProcess = (document, request) =>
+                {
+                    if (request.Headers.ContainsKey("X-External-Host"))
+                    {
+                        // Change document server settings to public
+                        document.Host = request.Headers["X-External-Host"].First();
+                        document.BasePath = request.Headers["X-External-Path"].First();
+                    }
+                };
+            });
+            app.UseSwaggerUi3();
+
             app.UseHealthChecks("/ready");
+            
 
             // Shows UseCors with CorsPolicyBuilder.
             app.UseCors(builder =>
@@ -76,14 +89,30 @@ namespace WdtA2Api
                         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            // Register the Swagger services
-            services.AddSwaggerDocument();
+            // swagger behind proxy
+            // https://github.com/RSuter/NSwag/wiki/AspNetCore-Middleware
+            services.Configure<ForwardedHeadersOptions>(options =>
+                {
+                    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                });
 
-            //add CORS support
+            // Register the Swagger services
+            services.AddSwaggerDocument(document =>
+                {
+                    document.PostProcess = d =>
+                        {
+                            d.Info.Title = "RMIT ASR";
+                        };
+                });
+            // add CORS support
             services.AddCors();
 
             services.AddDbContext<WdtA2ApiContext>(
-                options => options.UseLazyLoadingProxies().UseSqlServer(this.ConnectionString));
+                options => options
+                    .UseLazyLoadingProxies()
+                    .UseSqlServer(
+                        this.ConnectionString,
+                        opt => opt.EnableRetryOnFailure()));
             services.AddHealthChecks().AddDbContextCheck<WdtA2ApiContext>();
         }
     }
