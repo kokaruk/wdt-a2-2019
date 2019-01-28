@@ -37,7 +37,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
-            this._apiService = apiService;
+            _apiService = apiService;
         }
 
         [TempData]
@@ -102,6 +102,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                     {
                         GlobalStatusMessage = "Error. User Already Exists";
                         ModelState.AddModelError(string.Empty, "Error. User Already Exists");
+                        
                         // return this.RedirectToPage();
                         return Page();
                     }
@@ -130,7 +131,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                     }
                     catch (HttpRequestException)
                     {
-                        // exception caught can't ceate user for some reason
+                        // exception caught can't create user for some reason
                         var deleteResult = await this._userManager.DeleteAsync(user);
                     }
                     finally

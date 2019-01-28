@@ -77,24 +77,7 @@ namespace WdtApiLogin
 
             services.AddSession();
 
-            // https://github.com/aspnet/AspNetCore/issues/6069
-            services.AddAuthentication().AddGoogle(
-                o =>
-                    {
-                        o.ClientId = Configuration["Authentication:Google:ClientId"];
-                        o.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-                        o.UserInformationEndpoint = "https://www.googleapis.com/oauth2/v2/userinfo";
-                        o.ClaimActions.Clear();
-                        o.ClaimActions.MapJsonKey(ClaimTypes.NameIdentifier, "id");
-                        o.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
-                        o.ClaimActions.MapJsonKey(ClaimTypes.GivenName, "given_name");
-                        o.ClaimActions.MapJsonKey(ClaimTypes.Surname, "family_name");
-                        o.ClaimActions.MapJsonKey("urn:google:profile", "link");
-                        o.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
-                        o.ClaimActions.MapJsonKey("urn:google:image", "picture");
-                    });
-
-            services.ConfigureApplicationCookie(
+           services.ConfigureApplicationCookie(
                 options =>
                     {
                         // Cookie settings
