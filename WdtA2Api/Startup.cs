@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -36,8 +38,6 @@ namespace WdtA2Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUi3();
             }
 
             if (env.IsProduction() || env.IsStaging() || env.IsEnvironment("Staging_2"))
@@ -47,6 +47,21 @@ namespace WdtA2Api
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseSwagger(config =>
+            {
+                config.Path = "/swagger/v1/swagger.json";
+                config.PostProcess = (document, request) =>
+                {
+                    if (request.Headers.ContainsKey("X-External-Host"))
+                    {
+                        // Change document server settings to public
+                        document.Host = request.Headers["X-External-Host"].First();
+                        document.BasePath = request.Headers["X-External-Path"].First();
+                    }
+                };
+            });
+            app.UseSwaggerUi3();
 
             app.UseHealthChecks("/ready");
             
@@ -74,10 +89,22 @@ namespace WdtA2Api
                         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            // Register the Swagger services
-            services.AddSwaggerDocument();
+            // swagger behind proxy
+            // https://github.com/RSuter/NSwag/wiki/AspNetCore-Middleware
+            services.Configure<ForwardedHeadersOptions>(options =>
+                {
+                    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                });
 
-            //add CORS support
+            // Register the Swagger services
+            services.AddSwaggerDocument(document =>
+                {
+                    document.PostProcess = d =>
+                        {
+                            d.Info.Title = "RMIT ASR";
+                        };
+                });
+            // add CORS support
             services.AddCors();
 
             services.AddDbContext<WdtA2ApiContext>(
