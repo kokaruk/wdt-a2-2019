@@ -26,5 +26,12 @@ namespace WdtApiLogin.Controllers
 
             return View(users);
         }
+
+        public async Task<IActionResult> StaffAvailability()
+        {
+            var user = await this._apiService.Users.GetAsync("e12345");
+            return this.View();
+        }
+
     }
 }

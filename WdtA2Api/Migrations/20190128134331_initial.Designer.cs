@@ -10,7 +10,7 @@ using WdtA2Api.Data;
 namespace WdtA2Api.Migrations
 {
     [DbContext(typeof(WdtA2ApiContext))]
-    [Migration("20190126045208_initial")]
+    [Migration("20190128134331_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,8 @@ namespace WdtA2Api.Migrations
             modelBuilder.Entity("WdtModels.ApiModels.AccessLevel", b =>
                 {
                     b.Property<string>("Name")
-                        .ValueGeneratedOnAdd();
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(30);
 
                     b.HasKey("Name");
 
@@ -38,7 +39,8 @@ namespace WdtA2Api.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AccessName")
-                        .HasColumnName("AccessLevel");
+                        .HasColumnName("AccessLevel")
+                        .HasMaxLength(30);
 
                     b.Property<string>("Answer")
                         .IsRequired();

@@ -12,5 +12,11 @@ namespace WdtApiLogin.Controllers
         {
             return View();
         }
+
+        public IActionResult RoomAvailability()
+        {
+            return View();
+        }
+
     }
 }

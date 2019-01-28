@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 
 using WdtModels.ApiModels;
 
@@ -13,7 +14,7 @@ namespace WdtApiLogin.Repo
 
     public class UserService : Repository<User>, IUserService
     {
-        public UserService(HttpClient client) 
+        public UserService(Lazy<HttpClient> client) 
             : base("Users", client)
         {
         }

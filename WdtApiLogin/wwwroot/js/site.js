@@ -4,7 +4,7 @@
 // Write your JavaScript code
 
 window.setTimeout(function () {
-    $(".alert").fadeTo(150, 0).slideUp(200, function () {
+    $(".alert").fadeTo(300, 0).slideUp(300, function () {
         $(this).remove();
     });
-}, 4000);
+}, 1400);

@@ -34,7 +34,7 @@ namespace WdtApiLogin.Areas.Identity
                         services.AddIdentity<WdtApiLoginUser, IdentityRole>()
                             .AddDefaultUI(UIFramework.Bootstrap4)
                             .AddEntityFrameworkStores<WdtApiLoginContext>()
-                            .AddDefaultTokenProviders(); ;
+                            .AddDefaultTokenProviders();
 
                         // https://github.com/aspnet/AspNetCore/issues/6069
                         services.AddAuthentication().AddGoogle(

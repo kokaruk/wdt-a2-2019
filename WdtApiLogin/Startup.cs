@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -31,7 +32,10 @@ namespace WdtApiLogin
         private string ConnectionString => this._connectionString.Value;
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, UserManager<WdtApiLoginUser> userManager)
+        public void Configure(
+            IApplicationBuilder app,
+            IHostingEnvironment env,
+            UserManager<WdtApiLoginUser> userManager)
         {
             if (env.IsDevelopment())
             {
@@ -46,6 +50,8 @@ namespace WdtApiLogin
                 app.UseHsts();
             }
 
+            app.UseStatusCodePagesWithReExecute("/ErrorStatus/{0}");
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -56,13 +62,21 @@ namespace WdtApiLogin
 
             app.UseSession();
 
-            app.UseMvc(routes => { routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"); });
+            app.UseMvc(
+                routes =>
+                    {
+                        // New Route
+                        routes.MapRoute(
+                            name: "faq-route",
+                            template: "faq",
+                            defaults: new { controller = "Home", action = "Faq" });
+                        routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
+                    });
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.Configure<CookiePolicyOptions>(
                 options =>
                     {
@@ -71,13 +85,18 @@ namespace WdtApiLogin
                         options.MinimumSameSitePolicy = SameSiteMode.None;
                     });
 
-            services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddSessionStateTempDataProvider();
+            services.AddMvc(
+                config =>
+                    {
+                        // using Microsoft.AspNetCore.Mvc.Authorization;
+                        // using Microsoft.AspNetCore.Authorization;
+                        var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                        config.Filters.Add(new AuthorizeFilter(policy));
+                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddSessionStateTempDataProvider();
 
             services.AddSession();
 
-           services.ConfigureApplicationCookie(
+            services.ConfigureApplicationCookie(
                 options =>
                     {
                         // Cookie settings
@@ -86,8 +105,9 @@ namespace WdtApiLogin
                         options.SlidingExpiration = true;
                     });
 
-            services.AddHttpClient<IApiService, ApiService>(c => c.BaseAddress = new Uri(this.Configuration["WebApiUrl"]))
-                .SetHandlerLifetime(TimeSpan.FromMinutes(10)); 
+            services.AddHttpClient<IApiService, ApiService>(
+                    c => c.BaseAddress = new Uri(this.Configuration["WebApiUrl"]))
+                .SetHandlerLifetime(TimeSpan.FromMinutes(10));
         }
     }
 }

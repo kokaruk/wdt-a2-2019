@@ -30,9 +30,9 @@ namespace WdtApiLogin.Repo
     public class Repository<T> : IRepository<T> where T : class
     {
         protected readonly string EndPointUrl;
-        protected readonly HttpClient HtClient;
+        protected readonly Lazy<HttpClient> HtClient;
 
-        public Repository(string endPointUrl, HttpClient httpClient)
+        public Repository(string endPointUrl, Lazy<HttpClient> httpClient)
         {
             this.EndPointUrl = endPointUrl;
             this.HtClient = httpClient;
@@ -40,7 +40,7 @@ namespace WdtApiLogin.Repo
 
         public async Task<IEnumerable<T>> GetAllAsync()
         {
-            var response = await this.HtClient.GetAsync(this.EndPointUrl);
+            var response = await this.HtClient.Value.GetAsync(this.EndPointUrl);
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content
@@ -51,7 +51,7 @@ namespace WdtApiLogin.Repo
 
         public async Task<T> GetAsync(string path)
         {
-            var response = await this.HtClient.GetAsync(this.EndPointUrl + @"/" + path);
+            var response = await this.HtClient.Value.GetAsync(this.EndPointUrl + @"/" + path);
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content.ReadAsAsync<T>();
@@ -61,7 +61,7 @@ namespace WdtApiLogin.Repo
 
         public async Task<T> FindAsync(Func<T, bool> filter)
         {
-            var response = await this.HtClient.GetAsync(this.EndPointUrl);
+            var response = await this.HtClient.Value.GetAsync(this.EndPointUrl);
             response.EnsureSuccessStatusCode();
 
             var result = await response.Content
@@ -75,7 +75,7 @@ namespace WdtApiLogin.Repo
 
         public async Task<Uri> AddAsync(T entity)
         {
-            var response = await this.HtClient.PostAsJsonAsync(this.EndPointUrl, entity);
+            var response = await this.HtClient.Value.PostAsJsonAsync(this.EndPointUrl, entity);
             response.EnsureSuccessStatusCode();
 
             // return URI of the created resource.

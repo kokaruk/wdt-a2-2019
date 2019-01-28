@@ -12,7 +12,7 @@ namespace WdtA2Api.Migrations
                 name: "AccessLevels",
                 columns: table => new
                 {
-                    Name = table.Column<string>(nullable: false)
+                    Name = table.Column<string>(maxLength: 30, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -51,7 +51,7 @@ namespace WdtA2Api.Migrations
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     Question = table.Column<string>(nullable: false),
                     Answer = table.Column<string>(nullable: false),
-                    AccessLevel = table.Column<string>(nullable: true)
+                    AccessLevel = table.Column<string>(maxLength: 30, nullable: true)
                 },
                 constraints: table =>
                 {
