@@ -31,7 +31,10 @@ namespace WdtApiLogin
                     context.Database.Migrate();
                     var config = host.Services.GetRequiredService<IConfiguration>();
                     var testUserPw = config["testUserPw"];
-                    SeedData.Initialize(services, testUserPw).Wait();
+                    if (!string.IsNullOrWhiteSpace(testUserPw))
+                    {
+                        SeedData.Initialize(services, testUserPw).Wait();
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -51,25 +51,25 @@ namespace WdtA2Api.Data
                             {
                                 Question = "How to see available staff?",
                                 Answer = "Select 'Staff availability' from menu",
-                                AccessName = UserType.Staff.ToString()
+                                AccessName = UserConstants.Student
                             },
                         new Faq
                             {
                                 Question = "How to make a booking?",
                                 Answer = "Select 'My bookings' from menu",
-                                AccessName = UserType.Staff.ToString()
+                                AccessName = UserConstants.Student
                         },
                         new Faq
                             {
                                 Question = "How to see available rooms for booking?",
                                 Answer = "Select 'Rooms availability' from menu",
-                                AccessName = UserType.Student.ToString()
+                                AccessName = UserConstants.Staff
                         },
                         new Faq
                             {
                                 Question = "How to reserve a slot for booking?",
                                 Answer = "Select 'My bookings' from menu and follow the prompts",
-                                AccessName = UserType.Student.ToString()
+                                AccessName = UserConstants.Staff
                         });
 
                     context.SaveChangesAsync();

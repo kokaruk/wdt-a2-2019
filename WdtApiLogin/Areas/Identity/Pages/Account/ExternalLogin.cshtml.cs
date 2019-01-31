@@ -149,11 +149,11 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                              */
                             try
                             {
-                                var apiUser = await this._apiService.Users.FindAsync(u => u.UserID == userName);
+                                var apiUser = await this._apiService.User.FindAsync(u => u.UserID == userName);
                                 if (apiUser == null)
                                 {
                                     apiUser = new User { Email = user.Email, Name = user.Name, UserID = user.UserName };
-                                    var response = await this._apiService.Users.AddAsync(apiUser);
+                                    var response = await this._apiService.User.AddAsync(apiUser);
                                     await _userManager.AddToRoleAsync(user, user.Email.GetUserRoleFromUserName());
                                 }
                                 await _signInManager.SignInAsync(user, isPersistent: false);

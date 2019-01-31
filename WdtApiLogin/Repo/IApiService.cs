@@ -7,7 +7,12 @@ namespace WdtApiLogin.Repo
     {
         IFaqService Faq { get; }
 
-        IUserService Users { get; }
+        IUserService User { get; }
+
+        ISlotService Slots { get; }
+
+        IRoomService Room { get; }
+        
     }
 
     public class ApiService : IApiService
@@ -17,12 +22,18 @@ namespace WdtApiLogin.Repo
         public ApiService(HttpClient httpClient)
         {
             _httpClient = new Lazy<HttpClient>(() => httpClient);
-            Users = new UserService(this._httpClient);
+            this.User = new UserService(this._httpClient);
             Faq = new FaqService(this._httpClient);
+            Slots = new SlotService(this._httpClient);
+            Room = new RoomService(this._httpClient);
         }
-        
+
+        public IRoomService Room { get; }
+
         public IFaqService Faq { get; }
 
-        public IUserService Users { get; }
+        public IUserService User { get; }
+
+        public ISlotService Slots { get; }
     }
 }

@@ -22,7 +22,11 @@ namespace WdtApiLogin.Repo
 
         Task<T> FindAsync(Func<T, bool> filter);
 
+        Task<IEnumerable<T>> FindAllAsync(Func<T, bool> filter);
+
         Task<Uri> AddAsync(T entity);
+
+        Task<Uri> UpdateAsync(string path, T entity);
 
         void RemoveAsync(T entity);
     }
@@ -70,12 +74,33 @@ namespace WdtApiLogin.Repo
             var search = result.Where(filter).FirstOrDefault();
 
            return search;
+        }
 
+        public async Task<IEnumerable<T>> FindAllAsync(Func<T, bool> filter)
+        {
+            var response = await this.HtClient.Value.GetAsync(this.EndPointUrl);
+            response.EnsureSuccessStatusCode();
+
+            var result = await response.Content
+                             .ReadAsAsync<IEnumerable<T>>();
+
+            var search = result.Where(filter);
+
+            return search;
         }
 
         public async Task<Uri> AddAsync(T entity)
         {
             var response = await this.HtClient.Value.PostAsJsonAsync(this.EndPointUrl, entity);
+            response.EnsureSuccessStatusCode();
+
+            // return URI of the created resource.
+            return response.Headers.Location;
+        }
+
+        public async Task<Uri> UpdateAsync(string path, T entity)
+        {
+            var response = await this.HtClient.Value.PutAsJsonAsync(this.EndPointUrl + @"/" + path, entity);
             response.EnsureSuccessStatusCode();
 
             // return URI of the created resource.

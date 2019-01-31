@@ -24,9 +24,9 @@ namespace WdtApiLogin.Controllers
         
         public async Task<IActionResult> Index()
         {
-            var users = await this._apiService.Users.GetAllAsync();
+            var users = await this._apiService.User.GetAllAsync();
 
-            var user = await this._apiService.Users.GetAsync("e12345");
+            var user = await this._apiService.User.GetAsync("e12345");
             ViewBag.User = user;
 
             return View(users);
@@ -34,7 +34,7 @@ namespace WdtApiLogin.Controllers
 
         public async Task<IActionResult> StaffAvailability()
         {
-            var user = await this._apiService.Users.GetAsync("e12345");
+            var user = await this._apiService.User.GetAsync("e12345");
             return this.View();
         }
 

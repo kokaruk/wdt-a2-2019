@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,9 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WdtApiLogin.Areas.Identity.Data;
+using WdtApiLogin.Repo;
+
+using WdtModels.ApiModels;
 
 namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
 {
@@ -17,15 +21,18 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<WdtApiLoginUser> _userManager;
         private readonly SignInManager<WdtApiLoginUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly IApiService _apiService;
 
         public IndexModel(
             UserManager<WdtApiLoginUser> userManager,
             SignInManager<WdtApiLoginUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IApiService apiService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _apiService = apiService;
         }
 
         public string Username { get; set; }
@@ -88,10 +95,23 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
                 user.Name = Input.Name.Trim();
             }
 
-            await _userManager.UpdateAsync(user);
+            try
+            {
+                var apiUser = new User { Email = user.Email, Name = user.Name, UserID = user.UserName };
+                var response = await this._apiService.User.UpdateAsync(apiUser.UserID, apiUser);
 
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+                await _userManager.UpdateAsync(user);
+
+                await _signInManager.RefreshSignInAsync(user);
+                StatusMessage = "Your profile has been updated";
+
+            }
+            catch (HttpRequestException)
+            {
+                // exception caught can't create user for some reason
+                StatusMessage = "Error updating your profile";
+            }
+
             return RedirectToPage();
         }
 

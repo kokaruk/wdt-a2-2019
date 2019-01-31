@@ -99,7 +99,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
             {
                 try
                 {
-                    var apiUser = await this._apiService.Users.FindAsync(u => u.UserID == Input.UserName);
+                    var apiUser = await this._apiService.User.FindAsync(u => u.UserID == Input.UserName);
                     if (apiUser != null)
                     {
                         GlobalStatusMessage = "Error. User Already Exists";
@@ -129,7 +129,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                     try
                     {
                         var apiUser = new User { Email = user.Email, Name = user.Name, UserID = user.UserName };
-                        var response = await this._apiService.Users.AddAsync(apiUser);
+                        var response = await this._apiService.User.AddAsync(apiUser);
                         await _userManager.AddToRoleAsync(user, user.Email.GetUserRoleFromUserName());
                     }
                     catch (HttpRequestException)

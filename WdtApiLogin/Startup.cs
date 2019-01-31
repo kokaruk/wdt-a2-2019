@@ -30,8 +30,6 @@ namespace WdtApiLogin
 
         public IConfiguration Configuration { get; }
 
-        private string ConnectionString => this._connectionString.Value;
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
@@ -76,13 +74,8 @@ namespace WdtApiLogin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<CookiePolicyOptions>(
-                options =>
-                    {
-                        // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                        options.CheckConsentNeeded = context => true;
-                        options.MinimumSameSitePolicy = SameSiteMode.None;
-                    });
+
+            services.Configure<GenericSettingsModel>(Configuration.GetSection("GenericSettings"));
 
             services.AddMvc(
                 config =>
@@ -99,7 +92,14 @@ namespace WdtApiLogin
                     options.AddPolicy("RequireStaffRole", policy => policy.RequireRole(UserConstants.Staff));
                 });
 
-            services.AddSession();
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(
+                options =>
+                    {
+                        options.IdleTimeout = TimeSpan.FromSeconds(40);
+                        options.Cookie.HttpOnly = true;
+                    });
 
             services.ConfigureApplicationCookie(
                 options =>

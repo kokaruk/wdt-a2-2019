@@ -16,7 +16,7 @@ namespace WdtModels.ApiModels
 
         [Required, ForeignKey("User")]
         public string StaffID { get; set; }
-
+        [Display(Name = "Start Time"), DisplayFormat(DataFormatString = "{0:d-MM-yyy   hh tt}")]
         public DateTime StartTime { get; set; }
 
         public virtual User Student { get; set; }
