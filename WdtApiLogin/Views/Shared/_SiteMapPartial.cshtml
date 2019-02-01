@@ -10,8 +10,12 @@
         <div class="col-6 col-md">
             <h5>Main Menu</h5>
             <ul class="list-unstyled small">
-                <li><a class="text-muted" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                <li><a class="text-muted" asp-area="" asp-controller="Home" asp-action="Faq">F.A.Q.</a></li>
+                <li>
+                    <a class="text-muted" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li>
+                    <a class="text-muted" asp-area="" asp-controller="Home" asp-action="Faq">F.A.Q.</a>
+                </li>
             </ul>
         </div>
         @if ((await AuthorizationService.AuthorizeAsync(User, "RequireStaffRole")).Succeeded)
@@ -19,8 +23,12 @@
             <div class="col-6 col-md">
                 <h5>Staff</h5>
                 <ul class="list-unstyled small">
-                    <li><a class="text-muted" asp-area="" asp-controller="Staff" asp-action="Index">My bookings</a></li>
-                    <li><a class="text-muted" asp-area="" asp-controller="Staff" asp-action="RoomAvailability">Rooms availability</a></li>
+                    <li>
+                        <a class="text-muted" asp-area="" asp-controller="Staff" asp-action="Index">My bookings</a>
+                    </li>
+                    <li>
+                        <a class="text-muted" asp-area="" asp-controller="Staff" asp-action="RoomAvailability">Rooms availability</a>
+                    </li>
                 </ul>
             </div>
         }
@@ -29,8 +37,12 @@
             <div class="col-6 col-md">
                 <h5>Student</h5>
                 <ul class="list-unstyled small">
-                    <li><a class="text-muted" asp-area="" asp-controller="Student" asp-action="Index">My bookings</a></li>
-                    <li><a class="text-muted" asp-area="" asp-controller="Student" asp-action="StaffAvailability">Staff Availability</a></li>
+                    <li>
+                        <a class="text-muted" asp-area="" asp-controller="Student" asp-action="Index">My bookings</a>
+                    </li>
+                    <li>
+                        <a class="text-muted" asp-area="" asp-controller="Student" asp-action="StaffAvailability">Staff Availability</a>
+                    </li>
                 </ul>
             </div>
         }

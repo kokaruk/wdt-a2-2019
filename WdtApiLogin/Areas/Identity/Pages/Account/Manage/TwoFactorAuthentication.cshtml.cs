@@ -32,13 +32,11 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
 
         public int RecoveryCodesLeft { get; set; }
 
-        [BindProperty]
-        public bool Is2faEnabled { get; set; }
+        [BindProperty] public bool Is2faEnabled { get; set; }
 
         public bool IsMachineRemembered { get; set; }
 
-        [TempData]
-        public string StatusMessage { get; set; }
+        [TempData] public string StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGet()
         {
@@ -65,7 +63,8 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.ForgetTwoFactorClientAsync();
-            StatusMessage = "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.";
+            StatusMessage =
+                "The current browser has been forgotten. When you login again from this browser you will be prompted for your 2fa code.";
             return RedirectToPage();
         }
     }

@@ -13,9 +13,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using WdtApiLogin.Areas.Identity.Data;
 using WdtApiLogin.Repo;
-
 using WdtModels.ApiModels;
-
 using WdtUtils;
 
 namespace WdtApiLogin.Areas.Identity.Pages.Account
@@ -40,24 +38,19 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
             _apiService = apiService;
         }
 
-        [TempData]
-        public string GlobalStatusMessage { get; set; }
+        [TempData] public string GlobalStatusMessage { get; set; }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
+        [BindProperty] public InputModel Input { get; set; }
 
         public string LoginProvider { get; set; }
 
         public string ReturnUrl { get; set; }
 
-        [TempData]
-        public string ErrorMessage { get; set; }
+        [TempData] public string ErrorMessage { get; set; }
 
         public class InputModel
         {
-            [Required]
-            [EmailAddress]
-            public string Email { get; set; }
+            [Required] [EmailAddress] public string Email { get; set; }
         }
 
         public IActionResult OnGetAsync()
@@ -68,7 +61,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
         public IActionResult OnPost(string provider, string returnUrl = null)
         {
             // Request a redirect to the external login provider.
-            var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new { returnUrl });
+            var redirectUrl = Url.Page("./ExternalLogin", pageHandler: "Callback", values: new {returnUrl});
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             return new ChallengeResult(provider, properties);
         }
@@ -79,22 +72,26 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
             if (remoteError != null)
             {
                 ErrorMessage = $"Error from external provider: {remoteError}";
-                return RedirectToPage("./Login", new {ReturnUrl = returnUrl });
+                return RedirectToPage("./Login", new {ReturnUrl = returnUrl});
             }
+
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
                 ErrorMessage = "Error loading external login information.";
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                return RedirectToPage("./Login", new {ReturnUrl = returnUrl});
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey,
+                isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
+                    info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
+
             if (result.IsLockedOut)
             {
                 return RedirectToPage("./Lockout");
@@ -111,6 +108,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                         Email = info.Principal.FindFirstValue(ClaimTypes.Email)
                     };
                 }
+
                 return Page();
             }
         }
@@ -124,19 +122,19 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
             if (info == null)
             {
                 ErrorMessage = "Error loading external login information during confirmation.";
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                return RedirectToPage("./Login", new {ReturnUrl = returnUrl});
             }
 
             if (ModelState.IsValid)
             {
-
                 var regex = new Regex(@"^e\d{5}@rmit.edu.au$|^s\d{7}@student.rmit.edu.au$");
 
                 if (regex.IsMatch(Input.Email))
                 {
                     var userName = Regex.Match(Input.Email, @"^e\d{5}|^s\d{7}").Value;
 
-                    var user = new WdtApiLoginUser { UserName = userName, Email = Input.Email, Name = info.Principal.Identity.Name };
+                    var user = new WdtApiLoginUser
+                        {UserName = userName, Email = Input.Email, Name = info.Principal.Identity.Name};
                     var result = await _userManager.CreateAsync(user);
                     if (result.Succeeded)
                     {
@@ -152,12 +150,14 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                                 var apiUser = await this._apiService.User.FindAsync(u => u.UserID == userName);
                                 if (apiUser == null)
                                 {
-                                    apiUser = new User { Email = user.Email, Name = user.Name, UserID = user.UserName };
+                                    apiUser = new User {Email = user.Email, Name = user.Name, UserID = user.UserName};
                                     var response = await this._apiService.User.AddAsync(apiUser);
                                     await _userManager.AddToRoleAsync(user, user.Email.GetUserRoleFromUserName());
                                 }
+
                                 await _signInManager.SignInAsync(user, isPersistent: false);
-                                _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
+                                _logger.LogInformation("User created an account using {Name} provider.",
+                                    info.LoginProvider);
                                 GlobalStatusMessage = "Successfully Created new user account!";
                                 return LocalRedirect(returnUrl);
                             }
@@ -169,7 +169,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                                 ModelState.AddModelError(string.Empty, "Error. User Already Exists");
 
                                 // return this.RedirectToPage();
-                                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                                return RedirectToPage("./Login", new {ReturnUrl = returnUrl});
                             }
                         }
                     }
@@ -182,7 +182,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                 else
                 {
                     ErrorMessage = "Your email is out of allowed scope";
-                    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                    return RedirectToPage("./Login", new {ReturnUrl = returnUrl});
                 }
             }
 

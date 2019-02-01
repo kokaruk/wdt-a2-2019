@@ -1,48 +1,47 @@
-﻿@model WdtApiLogin.Controllers.StaffController
+﻿@model WdtApiLogin.Controllers.StaffController.InputModel
 @{
+    ViewData["Title"] = "Create New";
     dynamic rooms = ViewData["Rooms"];
 }
 
 
-
 <div id="main">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">Create New</h1>
+        <h1 class="h2">@ViewData["Title"] </h1>
     </div>
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-row">
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-row">
             <div class="form-group col-md-2">
-                <label asp-for="Input.Room"></label>
-                <select asp-for="Input.Room" asp-items="rooms" class="form-control" ></select>
-                <span asp-validation-for="Input.Room" class="text-danger"></span>
+                <label asp-for="RoomID"></label>
+                <select asp-for="RoomID" asp-items="rooms" class="form-control"></select>
+                <span asp-validation-for="RoomID" class="text-danger"></span>
             </div>
-                <div class="form-group col-md-4">
-                    <label asp-for="Input.StartDate"></label>
-                    <input asp-for="Input.StartDate"
-                           class="form-control"
-                           min="@($"{ViewBag.MinDate:yyyy-MM-d}")"
-                           value="@($"{ViewBag.MinDate:yyyy-MM-d}")" />
-                    <span asp-validation-for="Input.StartDate" class="text-danger"></span>
-                </div>
-                <div class="form-group col-md-4">
-                    <label asp-for="Input.StartTime"></label>
-                    <input asp-for="Input.StartTime" class="form-control" 
-                           min="@($"{ViewBag.MinHour:00}"):00" max="@(ViewBag.MaxHour):00"/>
-                    <span asp-validation-for="Input.StartTime" class="text-danger"></span>
-                </div>
+            <div class="form-group col-md-4">
+                <label asp-for="StartDate"></label>
+                <input asp-for="StartDate"
+                       class="form-control"
+                       min="@($"{ViewBag.MinDate:yyyy-MM-dd}")"
+                       value="@($"{ViewBag.MinDate:yyyy-MM-dd}")"/>
+                <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-outline-primary" />
+            <div class="form-group col-md-4">
+                <label asp-for="StartTime"></label>
+                <input asp-for="StartTime" class="form-control"
+                       min="@($"{ViewBag.MinHour:00}"):00" max="@(ViewBag.MaxHour):00"
+                       value="@(Model == null ? string.Empty : $"{Model.StartTime:HH:mm}")"/>
+                <span asp-validation-for="StartTime" class="text-danger"></span>
             </div>
-        </form>
-</div>
-
-
-<div>
-    <a asp-action="Index">Back to List</a>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-sm btn-outline-primary"/>
+            <a class="btn btn-sm btn-outline-secondary" asp-action="Index">
+                Back to List
+            </a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

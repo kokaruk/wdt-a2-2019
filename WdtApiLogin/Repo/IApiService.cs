@@ -12,7 +12,6 @@ namespace WdtApiLogin.Repo
         ISlotService Slots { get; }
 
         IRoomService Room { get; }
-        
     }
 
     public class ApiService : IApiService

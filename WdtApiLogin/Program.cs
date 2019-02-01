@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-
 using WdtApiLogin.Areas.Identity.Data;
 using WdtApiLogin.Models;
 
@@ -44,9 +43,6 @@ namespace WdtApiLogin
             }
 
             host.Run();
-
-
-
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>

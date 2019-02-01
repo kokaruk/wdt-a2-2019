@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-
 using WdtModels.ApiModels;
 
 namespace WdtApiLogin.Repo
@@ -16,5 +15,4 @@ namespace WdtApiLogin.Repo
         {
         }
     }
-
 }

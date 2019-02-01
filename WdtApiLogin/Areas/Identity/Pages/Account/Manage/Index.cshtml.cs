@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WdtApiLogin.Areas.Identity.Data;
 using WdtApiLogin.Repo;
-
 using WdtModels.ApiModels;
 
 namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
@@ -39,11 +38,9 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
 
         public string Email { get; set; }
 
-        [TempData]
-        public string StatusMessage { get; set; }
+        [TempData] public string StatusMessage { get; set; }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
+        [BindProperty] public InputModel Input { get; set; }
 
         public class InputModel
         {
@@ -97,14 +94,13 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
 
             try
             {
-                var apiUser = new User { Email = user.Email, Name = user.Name, UserID = user.UserName };
+                var apiUser = new User {Email = user.Email, Name = user.Name, UserID = user.UserName};
                 var response = await this._apiService.User.UpdateAsync(apiUser.UserID, apiUser);
 
                 await _userManager.UpdateAsync(user);
 
                 await _signInManager.RefreshSignInAsync(user);
                 StatusMessage = "Your profile has been updated";
-
             }
             catch (HttpRequestException)
             {

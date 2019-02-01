@@ -9,7 +9,7 @@ namespace WdtModels.ApiModels
     {
         [JsonIgnore]
         public virtual Room Room { get; set; }
-        [ForeignKey("Room"), Display(Name = "Room Id")]
+        [ForeignKey("Room"), Display(Name = "Room")]
         public string RoomID { get; set; }
 
         public virtual User Staff { get; set; }

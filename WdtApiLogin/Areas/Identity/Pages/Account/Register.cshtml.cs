@@ -12,9 +12,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using WdtApiLogin.Areas.Identity.Data;
 using WdtApiLogin.Repo;
-
 using WdtModels.ApiModels;
-
 using WdtUtils;
 
 namespace WdtApiLogin.Areas.Identity.Pages.Account
@@ -42,21 +40,19 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
             _apiService = apiService;
         }
 
-        [TempData]
-        public string GlobalStatusMessage { get; set; }
+        [TempData] public string GlobalStatusMessage { get; set; }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
+        [BindProperty] public InputModel Input { get; set; }
 
         public string ReturnUrl { get; set; }
 
         public class InputModel
         {
-
             private const string RegExErrMessage = "Staff starts with a letter ‘e’ followed by 5 numbers. <br>"
                                                    + "Student starts with a letter ‘s’ followed by 7 numbers";
 
-            private const string StringLengthError = "The {0} must be at least {2} and at max {1} characters long. <br>" + RegExErrMessage;
+            private const string StringLengthError =
+                "The {0} must be at least {2} and at max {1} characters long. <br>" + RegExErrMessage;
 
             [Required]
             [DataType(DataType.Text)]
@@ -104,7 +100,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                     {
                         GlobalStatusMessage = "Error. User Already Exists";
                         ModelState.AddModelError(string.Empty, "Error. User Already Exists");
-                        
+
                         // return this.RedirectToPage();
                         return Page();
                     }
@@ -113,22 +109,22 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                 {
                     // exception caught, user doesn't exist
                 }
-                
+
                 var user = new WdtApiLoginUser
-                               {
-                                   UserName = Input.UserName,
-                                                   Email = Input.UserName.StartsWith('s') 
-                                                               ? Input.UserName + "@student.rmit.edu.au" 
-                                                               : Input.UserName + "@rmit.edu.au",
-                                                   Name = Input.Name.Trim()
-                               };
+                {
+                    UserName = Input.UserName,
+                    Email = Input.UserName.StartsWith('s')
+                        ? Input.UserName + "@student.rmit.edu.au"
+                        : Input.UserName + "@rmit.edu.au",
+                    Name = Input.Name.Trim()
+                };
 
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
                     try
                     {
-                        var apiUser = new User { Email = user.Email, Name = user.Name, UserID = user.UserName };
+                        var apiUser = new User {Email = user.Email, Name = user.Name, UserID = user.UserName};
                         var response = await this._apiService.User.AddAsync(apiUser);
                         await _userManager.AddToRoleAsync(user, user.Email.GetUserRoleFromUserName());
                     }
@@ -145,8 +141,8 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account
                     }
 
                     return LocalRedirect(returnUrl);
-
                 }
+
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);

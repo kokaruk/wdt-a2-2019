@@ -9,12 +9,8 @@ namespace WdtApiLogin.Areas.Identity.Data
     // Add profile data for application users by adding properties to the WdtApiLoginUser class
     public class WdtApiLoginUser : IdentityUser
     {
+        [PersonalData] public override string Email { get; set; }
 
-
-        [PersonalData]
-        public override string Email { get; set; }
-
-        [PersonalData]
-        public string Name { get; set; }
+        [PersonalData] public string Name { get; set; }
     }
 }

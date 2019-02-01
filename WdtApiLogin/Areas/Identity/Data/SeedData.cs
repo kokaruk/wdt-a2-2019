@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-
 using WdtUtils;
 using WdtUtils.Model;
 
@@ -28,27 +26,27 @@ namespace WdtApiLogin.Areas.Identity.Data
             {
                 if (!await roleManager.RoleExistsAsync(accessLevel))
                 {
-                    await roleManager.CreateAsync(new IdentityRole { Name = accessLevel });
+                    await roleManager.CreateAsync(new IdentityRole {Name = accessLevel});
                 }
             }
 
 
             var users = new List<WdtApiLoginUser>
-                            {
-                                new WdtApiLoginUser
-                                    {
-                                        UserName = "e12345", Email = "e12345@rmit.edu.au", Name = "Matt"
-                                    },
-                                new WdtApiLoginUser { UserName = "e56789", Email = "e56789@rmit.edu.au", Name = "Joe" },
-                                new WdtApiLoginUser
-                                    {
-                                        UserName = "s1234567", Email = "s1234567@student.rmit.edu.auu", Name = "Kevin"
-                                    },
-                                new WdtApiLoginUser
-                                    {
-                                        UserName = "s4567890", Email = "s4567890@student.rmit.edu.au", Name = "Olivier"
-                                    }
-                            };
+            {
+                new WdtApiLoginUser
+                {
+                    UserName = "e12345", Email = "e12345@rmit.edu.au", Name = "Matt"
+                },
+                new WdtApiLoginUser {UserName = "e56789", Email = "e56789@rmit.edu.au", Name = "Joe"},
+                new WdtApiLoginUser
+                {
+                    UserName = "s1234567", Email = "s1234567@student.rmit.edu.auu", Name = "Kevin"
+                },
+                new WdtApiLoginUser
+                {
+                    UserName = "s4567890", Email = "s4567890@student.rmit.edu.au", Name = "Olivier"
+                }
+            };
 
             foreach (var user in users)
             {
@@ -82,15 +80,16 @@ namespace WdtApiLogin.Areas.Identity.Data
             return ir;
         }
 
-        private static async Task<string> EnsureUser(IServiceProvider serviceProvider, string testUserPw, WdtApiLoginUser userInMemory)
+        private static async Task<string> EnsureUser(IServiceProvider serviceProvider, string testUserPw,
+            WdtApiLoginUser userInMemory)
         {
             var userManager = serviceProvider.GetService<UserManager<WdtApiLoginUser>>();
 
             var user = await userManager.FindByEmailAsync(userInMemory.Email);
             if (user == null)
             {
-               await userManager.CreateAsync(userInMemory, testUserPw);
-               user = await userManager.FindByEmailAsync(userInMemory.Email);
+                await userManager.CreateAsync(userInMemory, testUserPw);
+                user = await userManager.FindByEmailAsync(userInMemory.Email);
             }
 
             return user.Id;

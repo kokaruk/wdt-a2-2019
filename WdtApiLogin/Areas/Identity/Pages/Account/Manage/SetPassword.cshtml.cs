@@ -23,11 +23,9 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
             _signInManager = signInManager;
         }
 
-        [BindProperty]
-        public InputModel Input { get; set; }
+        [BindProperty] public InputModel Input { get; set; }
 
-        [TempData]
-        public string StatusMessage { get; set; }
+        [TempData] public string StatusMessage { get; set; }
 
         public class InputModel
         {
@@ -84,6 +82,7 @@ namespace WdtApiLogin.Areas.Identity.Pages.Account.Manage
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
+
                 return Page();
             }
 

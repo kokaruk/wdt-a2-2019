@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,10 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 using WdtApiLogin.Areas.Identity.Data;
 using WdtApiLogin.Repo;
-
 using WdtUtils;
 using WdtUtils.Model;
 
@@ -36,6 +33,8 @@ namespace WdtApiLogin
             IHostingEnvironment env,
             UserManager<WdtApiLoginUser> userManager)
         {
+            app.UseStaticFiles();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -49,10 +48,12 @@ namespace WdtApiLogin
                 app.UseHsts();
             }
 
+            app.UseStatusCodePages();
+            
             app.UseStatusCodePagesWithReExecute("/ErrorStatus/{0}");
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
+
             app.UseCookiePolicy();
 
             app.UseAuthentication();
@@ -61,54 +62,53 @@ namespace WdtApiLogin
 
             app.UseMvc(
                 routes =>
-                    {
-                        // New Route
-                        routes.MapRoute(
-                            name: "faq-route",
-                            template: "faq",
-                            defaults: new { controller = "Home", action = "Faq" });
-                        routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
-                    });
+                {
+                    // New Route
+                    routes.MapRoute(
+                        name: "faq-route",
+                        template: "faq",
+                        defaults: new {controller = "Home", action = "Faq"});
+                    routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
+                });
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.Configure<GenericSettingsModel>(Configuration.GetSection("GenericSettings"));
 
             services.AddMvc(
                 config =>
-                    {
-                        // using Microsoft.AspNetCore.Mvc.Authorization;
-                        // using Microsoft.AspNetCore.Authorization;
-                        var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-                        config.Filters.Add(new AuthorizeFilter(policy));
-                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddSessionStateTempDataProvider();
+                {
+                    // using Microsoft.AspNetCore.Mvc.Authorization;
+                    // using Microsoft.AspNetCore.Authorization;
+                    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                    config.Filters.Add(new AuthorizeFilter(policy));
+                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddSessionStateTempDataProvider();
 
             services.AddAuthorization(options =>
-                {
-                    options.AddPolicy("RequireStudentRole", policy => policy.RequireRole(UserConstants.Student));
-                    options.AddPolicy("RequireStaffRole", policy => policy.RequireRole(UserConstants.Staff));
-                });
+            {
+                options.AddPolicy("RequireStudentRole", policy => policy.RequireRole(UserConstants.Student));
+                options.AddPolicy("RequireStaffRole", policy => policy.RequireRole(UserConstants.Staff));
+            });
 
             services.AddDistributedMemoryCache();
 
             services.AddSession(
                 options =>
-                    {
-                        options.IdleTimeout = TimeSpan.FromSeconds(40);
-                        options.Cookie.HttpOnly = true;
-                    });
+                {
+                    options.IdleTimeout = TimeSpan.FromSeconds(40);
+                    options.Cookie.HttpOnly = true;
+                });
 
             services.ConfigureApplicationCookie(
                 options =>
-                    {
-                        // Cookie settings
-                        options.Cookie.HttpOnly = true;
-                        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                        options.SlidingExpiration = true;
-                    });
+                {
+                    // Cookie settings
+                    options.Cookie.HttpOnly = true;
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                    options.SlidingExpiration = true;
+                });
 
             services.AddHttpClient<IApiService, ApiService>(
                     c => c.BaseAddress = new Uri(this.Configuration["WebApiUrl"]))
