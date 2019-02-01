@@ -111,13 +111,13 @@ namespace WdtApiLogin.Controllers
                 slotCandidate.StudentID = null;
                 slotCandidate.Student = null;
                 await _apiService.Slots.UpdateAsync(slotCandidate);
-                GlobalStatusMessage = $"Unbooked slot room {slot.RoomID} at {slot.StartTime:hh:mm tt}";
+                GlobalStatusMessage = $"Successfully cancelled appointment in room {slot.RoomID} at {slot.StartTime:hh:mm tt}";
             }
             catch (HttpRequestException)
             {
                 const string message = "Error un-booking slot";
                 GlobalStatusMessage = message;
-                return NotFound(message);
+                return NotFound();
             }
 
             return RedirectToAction(nameof(Index));
@@ -153,10 +153,8 @@ namespace WdtApiLogin.Controllers
                 
                 if (string.IsNullOrWhiteSpace(msg))
                 {
-                    if (slotCandidate.StaffID == input.StaffId && string.IsNullOrWhiteSpace(slotCandidate.StudentID))
+                    if (slotCandidate.StaffID == input.StaffId)
                     {
-                        var user = await _userManager.GetUserAsync(User);
-                        slotCandidate.StudentID = user.UserName;
                         await _apiService.Slots.UpdateAsync(slotCandidate);
                         GlobalStatusMessage = $"Booked slot room {slotCandidate.RoomID} at {slotCandidate.StartTime:hh:mm tt}";    
                     }
@@ -179,7 +177,7 @@ namespace WdtApiLogin.Controllers
                 GlobalStatusMessage = message;
                 return NotFound(message);
             }
-            return RedirectToAction(nameof(StaffAvailability));
+            return RedirectToAction(nameof(Index));
         }
         
         

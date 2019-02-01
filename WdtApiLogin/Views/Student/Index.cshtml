@@ -34,15 +34,15 @@
                             <input type="text" readonly class="form-control-plaintext" asp-for="@Model.Slot.StartTime" value="@item.StartTime">
                         </td>
                         <td>
-                            @item.Staff.Name
-                            <input type="hidden" asp-for="@Model.Slot.StaffID" value="@item.StaffID"/>
+                            <input type="text" readonly disabled class="form-control-plaintext" value="@item.Staff.Name">
                         </td>
                         <td class="text-right">
                             <div class="btn-group mr-2">
-                                <input type="submit" value="Unbook" class="btn btn-sm btn-outline-secondary"/>
+                                <input type="submit" value="Cancel appointment" class="btn btn-sm btn-outline-secondary"/>
                             </div>
                         </td>
                     </tr>
+                    <input type="hidden" asp-for="@Model.Slot.StaffID" value="@item.StaffID"/>
                 </form>
             }
             </tbody>

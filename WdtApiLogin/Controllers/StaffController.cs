@@ -188,6 +188,7 @@ namespace WdtApiLogin.Controllers
             }
             else
             {
+                TempData.Put("CheckView", input);
                 return RedirectToAction(nameof(RoomAvailability));
             }
         }
@@ -229,6 +230,7 @@ namespace WdtApiLogin.Controllers
             [Display(Name = "Slot Date")]
             [DataType(DataType.Date)]
             [DisplayFormat(DataFormatString = "{0:dd-MM-yyy}", ApplyFormatInEditMode = true)]
+            [Required]
             public DateTime StartDate { get; set; }
 
             public Room Room { get; set; }
