@@ -7,15 +7,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
 using WdtApiLogin.Areas.Identity.Data;
 using WdtApiLogin.Models;
 using WdtApiLogin.Repo;
 using WdtModels.ApiModels;
-using WdtUtils.Model;
 using WdtUtils;
+using WdtUtils.Model;
 
 // ReSharper disable StyleCop.SA1201
 namespace WdtApiLogin.Controllers
@@ -47,10 +46,7 @@ namespace WdtApiLogin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete([Bind("RoomID, StartTime")] Slot slot)
         {
-            if (slot == null)
-            {
-                return NotFound();
-            }
+            if (slot == null) return NotFound();
 
             try
             {
@@ -109,7 +105,6 @@ namespace WdtApiLogin.Controllers
         public async Task<IActionResult> Create([Bind] InputModel input)
         {
             if (ModelState.IsValid)
-            {
                 try
                 {
                     var user = await _userManager.GetUserAsync(User);
@@ -129,31 +124,26 @@ namespace WdtApiLogin.Controllers
                         GlobalStatusMessage = "Successfully published new slot";
                         return RedirectToAction(nameof(Index));
                     }
-                    else
-                    {
-                        GlobalStatusMessage = msg;
-                        TempData.Put("input", input);
 
-                        return RedirectToAction(nameof(Create));
-                    }
+                    GlobalStatusMessage = msg;
+                    TempData.Put("input", input);
+
+                    return RedirectToAction(nameof(Create));
                 }
                 catch (HttpRequestException)
                 {
                     GlobalStatusMessage = "Error creating new slot.";
                     return RedirectToAction(nameof(Create));
                 }
-            }
-            else
-            {
-                ViewBag.MinDate = _genericSettings.Value.WorkingHoursEnd.MinDate();
-                ViewBag.MinHour = _genericSettings.Value.WorkingHoursStart;
-                ViewBag.MaxHour = _genericSettings.Value.WorkingHoursEnd;
 
-                var rooms = await _apiService.Room.GetAllAsync();
-                Rooms = rooms.Select(r => new SelectListItem {Text = r.RoomID});
+            ViewBag.MinDate = _genericSettings.Value.WorkingHoursEnd.MinDate();
+            ViewBag.MinHour = _genericSettings.Value.WorkingHoursStart;
+            ViewBag.MaxHour = _genericSettings.Value.WorkingHoursEnd;
 
-                return View(input);
-            }
+            var rooms = await _apiService.Room.GetAllAsync();
+            Rooms = rooms.Select(r => new SelectListItem {Text = r.RoomID});
+
+            return View(input);
         }
 
         public async Task<IActionResult> Index()
@@ -174,7 +164,8 @@ namespace WdtApiLogin.Controllers
             return input != null ? View(input) : View();
         }
 
-        [HttpPost, ActionName("Check")]
+        [HttpPost]
+        [ActionName("Check")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RoomAvailability([Bind] CheckViewModel input)
         {
@@ -186,11 +177,9 @@ namespace WdtApiLogin.Controllers
                 TempData.Put("CheckView", input);
                 return RedirectToAction(nameof(RoomAvailability));
             }
-            else
-            {
-                TempData.Put("CheckView", input);
-                return RedirectToAction(nameof(RoomAvailability));
-            }
+
+            TempData.Put("CheckView", input);
+            return RedirectToAction(nameof(RoomAvailability));
         }
 
         public class InputModel

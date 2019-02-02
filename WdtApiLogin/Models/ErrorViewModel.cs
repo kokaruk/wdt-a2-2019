@@ -1,5 +1,3 @@
-using System;
-
 namespace WdtApiLogin.Models
 {
     public class ErrorViewModel

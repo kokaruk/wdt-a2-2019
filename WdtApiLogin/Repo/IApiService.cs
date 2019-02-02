@@ -21,10 +21,10 @@ namespace WdtApiLogin.Repo
         public ApiService(HttpClient httpClient)
         {
             _httpClient = new Lazy<HttpClient>(() => httpClient);
-            this.User = new UserService(this._httpClient);
-            Faq = new FaqService(this._httpClient);
-            Slots = new SlotService(this._httpClient);
-            Room = new RoomService(this._httpClient);
+            User = new UserService(_httpClient);
+            Faq = new FaqService(_httpClient);
+            Slots = new SlotService(_httpClient);
+            Room = new RoomService(_httpClient);
         }
 
         public IRoomService Room { get; }

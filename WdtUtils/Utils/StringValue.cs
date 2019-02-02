@@ -6,7 +6,7 @@ namespace WdtUtils.Utils
     {
         public StringValue(string value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public string Value { get; }

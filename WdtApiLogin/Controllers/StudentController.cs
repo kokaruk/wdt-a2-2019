@@ -65,14 +65,15 @@ namespace WdtApiLogin.Controllers
             return View(input);
         }
 
-        [HttpPost, ActionName("Check")]
+        [HttpPost]
+        [ActionName("Check")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> StaffAvailability([Bind] CheckViewModel input)
         {
             try
             {
                 var slots = await _apiService.Slots.FindAllAsync(s =>
-                    s.StaffID == input.StaffId 
+                    s.StaffID == input.StaffId
                     && s.StartTime > input.StartDate
                     && string.IsNullOrWhiteSpace(s.StudentID));
                 input.Slots = slots;
@@ -81,7 +82,7 @@ namespace WdtApiLogin.Controllers
             {
                 return RedirectToAction(nameof(Index));
             }
-            
+
             TempData.Put("CheckView", input);
             return RedirectToAction(nameof(StaffAvailability));
         }
@@ -91,10 +92,7 @@ namespace WdtApiLogin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Unbook([Bind("RoomID, StartTime, StaffID")] Slot slot)
         {
-            if (slot == null)
-            {
-                return NotFound();
-            }
+            if (slot == null) return NotFound();
 
             try
             {
@@ -111,7 +109,8 @@ namespace WdtApiLogin.Controllers
                 slotCandidate.StudentID = null;
                 slotCandidate.Student = null;
                 await _apiService.Slots.UpdateAsync(slotCandidate);
-                GlobalStatusMessage = $"Successfully cancelled appointment in room {slot.RoomID} at {slot.StartTime:hh:mm tt}";
+                GlobalStatusMessage =
+                    $"Successfully cancelled appointment in room {slot.RoomID} at {slot.StartTime:hh:mm tt}";
             }
             catch (HttpRequestException)
             {
@@ -122,7 +121,7 @@ namespace WdtApiLogin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-        
+
         private async Task<string> CanBook(Slot slot)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -131,32 +130,30 @@ namespace WdtApiLogin.Controllers
                 return "Error. Student reached daily booking limit";
             return string.Empty;
         }
-        
-        
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Book(CheckViewModel input)
         {
-            if (input == null || !ModelState.IsValid) 
-            {
-                return NotFound();
-            }
+            if (input == null || !ModelState.IsValid) return NotFound();
 
-            TempData.Put("CheckView", new CheckViewModel{StaffId = input.StaffId});
-            
+            TempData.Put("CheckView", new CheckViewModel {StaffId = input.StaffId});
+
             try
             {
                 var candidateId = $"{input.Room.RoomID}/{input.StartDate:s}";
                 var slotCandidate = await _apiService.Slots.GetAsync(candidateId);
 
                 var msg = await CanBook(slotCandidate);
-                
+
                 if (string.IsNullOrWhiteSpace(msg))
                 {
                     if (slotCandidate.StaffID == input.StaffId)
                     {
                         await _apiService.Slots.UpdateAsync(slotCandidate);
-                        GlobalStatusMessage = $"Booked slot room {slotCandidate.RoomID} at {slotCandidate.StartTime:hh:mm tt}";    
+                        GlobalStatusMessage =
+                            $"Booked slot room {slotCandidate.RoomID} at {slotCandidate.StartTime:hh:mm tt}";
                     }
                     else
                     {
@@ -169,7 +166,6 @@ namespace WdtApiLogin.Controllers
                     GlobalStatusMessage = msg;
                     return RedirectToAction(nameof(StaffAvailability));
                 }
-                
             }
             catch (HttpRequestException)
             {
@@ -177,10 +173,11 @@ namespace WdtApiLogin.Controllers
                 GlobalStatusMessage = message;
                 return NotFound(message);
             }
+
             return RedirectToAction(nameof(Index));
         }
-        
-        
+
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         [AllowAnonymous]
         public IActionResult Error()

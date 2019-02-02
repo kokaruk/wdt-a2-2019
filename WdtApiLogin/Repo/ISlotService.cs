@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using WdtApiLogin.Controllers;
 using WdtModels.ApiModels;
 
 namespace WdtApiLogin.Repo
@@ -14,7 +12,6 @@ namespace WdtApiLogin.Repo
         Task<Slot> StaffBookedThisTime(Slot slot);
         Task<bool> StaffMemberOverBookedForThisDay(Slot slot, int dailyLimit);
         Task<bool> StudentOverBookedForThisDay(Slot slot, int dailyLimit);
-
     }
 
     public class SlotService : Repository<Slot>, ISlotService
@@ -50,6 +47,5 @@ namespace WdtApiLogin.Repo
                 s => s.StartTime.Date == slot.StartTime.Date && s.StudentID == slot.StudentID);
             return studentBooked.Count() >= dailyLimit;
         }
-        
     }
 }

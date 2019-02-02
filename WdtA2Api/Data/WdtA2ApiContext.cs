@@ -17,13 +17,13 @@ namespace WdtA2Api.Data
         public DbSet<User> User { get; set; }
 
         public DbSet<AccessLevel> AccessLevels { get; set; }
-         
+
         public DbSet<Faq> Faq { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Slot>().HasKey(slot => new { slot.RoomID, slot.StartTime });
+            modelBuilder.Entity<Slot>().HasKey(slot => new {slot.RoomID, slot.StartTime});
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Data.SqlClient;
-
-using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using WdtUtils.Model;
 
@@ -10,13 +9,18 @@ namespace WdtUtils
 {
     public static class MiscExtUtils
     {
+        public static string GetUserRoleFromUserName(this string value)
+        {
+            return value.StartsWith('e') ? UserConstants.Staff : UserConstants.Student;
+        }
 
-        public static string GetUserRoleFromUserName(this string value) => value.StartsWith('e') ? UserConstants.Staff : UserConstants.Student;
+        public static DateTime MinDate(this int cutoff)
+        {
+            return DateTime.Now.Hour > cutoff
+                ? DateTime.Now.AddDays(1)
+                : DateTime.Now;
+        }
 
-        public static DateTime MinDate(this int cutoff) => DateTime.Now.Hour > cutoff
-            ? DateTime.Now.AddDays(1)
-            : DateTime.Now;
-        
         public static string BuildConnectionString(this IConfiguration value)
         {
             try
@@ -24,9 +28,9 @@ namespace WdtUtils
                 var secrets = value.GetSection(nameof(DbSecrets)).Get<DbSecrets>();
                 var sqlString =
                     new SqlConnectionStringBuilder(value.GetConnectionString("wdtA2"))
-                        {
-                            UserID = secrets.Uid, Password = secrets.Password
-                        };
+                    {
+                        UserID = secrets.Uid, Password = secrets.Password
+                    };
                 return sqlString.ConnectionString;
             }
             catch (Exception)
@@ -34,9 +38,9 @@ namespace WdtUtils
                 var sqlString = new SqlConnectionStringBuilder(value.GetConnectionString("wdtA2Production"));
                 return sqlString.ConnectionString;
             }
-        }   
+        }
     }
-    
+
     // serializing temp data 
     // https://stackoverflow.com/questions/34638823/store-complex-object-in-tempdata
     public static class TempDataExtensions
@@ -50,8 +54,7 @@ namespace WdtUtils
         {
             object o;
             tempData.TryGetValue(key, out o);
-            return o == null ? null : JsonConvert.DeserializeObject<T>((string)o);
+            return o == null ? null : JsonConvert.DeserializeObject<T>((string) o);
         }
     }
-    
 }

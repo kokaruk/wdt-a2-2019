@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
 using WdtA2Api.Data;
 using WdtModels.ApiModels;
 
@@ -65,7 +63,7 @@ namespace WdtA2Api.Controllers
             _context.Room.Add(room);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRoom", new { id = room.RoomID }, room);
+            return CreatedAtAction("GetRoom", new {id = room.RoomID}, room);
         }
 
         // PUT: api/Rooms/5

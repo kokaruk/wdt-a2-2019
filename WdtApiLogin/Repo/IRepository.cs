@@ -25,7 +25,7 @@ namespace WdtApiLogin.Repo
         Task<Uri> AddAsync(T entity);
 
         Task<Uri> UpdateAsync(string path, T entity);
-        
+
         Task<Uri> UpdateAsync(T entity);
 
         Task<T> RemoveAsync(string path);
@@ -106,7 +106,7 @@ namespace WdtApiLogin.Repo
             // return URI of the created resource.
             return response.Headers.Location;
         }
-        
+
         public async Task<Uri> UpdateAsync(T entity)
         {
             var response = await HtClient.Value.PutAsJsonAsync(EndPointUrl, entity);

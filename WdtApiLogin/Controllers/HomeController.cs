@@ -14,16 +14,13 @@ namespace WdtApiLogin.Controllers
     {
         private readonly IApiService _apiService;
         private readonly SignInManager<WdtApiLoginUser> _signInManager;
-        private readonly UserManager<WdtApiLoginUser> _userManager;
 
         public HomeController(
             IApiService apiService,
-            UserManager<WdtApiLoginUser> userManager,
             SignInManager<WdtApiLoginUser> signInManager)
         {
-            this._apiService = apiService;
-            this._userManager = userManager;
-            this._signInManager = signInManager;
+            _apiService = apiService;
+            _signInManager = signInManager;
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -36,11 +33,11 @@ namespace WdtApiLogin.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Faq()
         {
-            var faqList = await this._apiService.Faq.FindAllAsync(faq => string.IsNullOrWhiteSpace(faq.AccessName));
+            var faqList = await _apiService.Faq.FindAllAsync(faq => string.IsNullOrWhiteSpace(faq.AccessName));
 
-            if (this._signInManager.IsSignedIn(User))
+            if (_signInManager.IsSignedIn(User))
             {
-                var fq2 = await this._apiService.Faq.FindAllAsync(faq => !string.IsNullOrWhiteSpace(faq.AccessName));
+                var fq2 = await _apiService.Faq.FindAllAsync(faq => !string.IsNullOrWhiteSpace(faq.AccessName));
                 var joinedList = faqList.Concat(fq2.Where(faq => User.IsInRole(faq.AccessName)));
                 return View(joinedList);
             }
