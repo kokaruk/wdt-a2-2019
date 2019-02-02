@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -26,7 +27,54 @@ namespace WdtApiLogin
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.Configure<GenericSettingsModel>(Configuration.GetSection("GenericSettings"));
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+            
+            services.AddMvc(
+                config =>
+                {
+                    // using Microsoft.AspNetCore.Mvc.Authorization;
+                    // using Microsoft.AspNetCore.Authorization;
+                    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+                    config.Filters.Add(new AuthorizeFilter(policy));
+                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddSessionStateTempDataProvider();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireStudentRole", policy => policy.RequireRole(UserConstants.Student));
+                options.AddPolicy("RequireStaffRole", policy => policy.RequireRole(UserConstants.Staff));
+            });
+
+            services.AddSession(
+                options =>
+                {
+                    options.IdleTimeout = TimeSpan.FromSeconds(40);
+                    options.Cookie.HttpOnly = true;
+                });
+
+            services.ConfigureApplicationCookie(
+                options =>
+                {
+                    // Cookie settings
+                    options.Cookie.HttpOnly = true;
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                    options.SlidingExpiration = true;
+                });
+
+            services.AddHttpClient<IApiService, ApiService>(
+                    c => c.BaseAddress = new Uri(Configuration["WebApiUrl"]))
+                .SetHandlerLifetime(TimeSpan.FromMinutes(10));
+        }
+        
+        
         public void Configure(
             IApplicationBuilder app,
             IHostingEnvironment env,
@@ -38,7 +86,6 @@ namespace WdtApiLogin
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
-                app.UseHttpsRedirection();
             }
             else
             {
@@ -47,7 +94,8 @@ namespace WdtApiLogin
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 // app.UseHsts();
             }
-
+            
+            app.UseHttpsRedirection();
             app.UseStatusCodePages();
 
             app.UseStatusCodePagesWithReExecute("/ErrorStatus/{0}");
@@ -71,46 +119,6 @@ namespace WdtApiLogin
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.Configure<GenericSettingsModel>(Configuration.GetSection("GenericSettings"));
-
-            services.AddMvc(
-                config =>
-                {
-                    // using Microsoft.AspNetCore.Mvc.Authorization;
-                    // using Microsoft.AspNetCore.Authorization;
-                    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
-                    config.Filters.Add(new AuthorizeFilter(policy));
-                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddSessionStateTempDataProvider();
-
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("RequireStudentRole", policy => policy.RequireRole(UserConstants.Student));
-                options.AddPolicy("RequireStaffRole", policy => policy.RequireRole(UserConstants.Staff));
-            });
-
-            services.AddDistributedMemoryCache();
-
-            services.AddSession(
-                options =>
-                {
-                    options.IdleTimeout = TimeSpan.FromSeconds(40);
-                    options.Cookie.HttpOnly = true;
-                });
-
-            services.ConfigureApplicationCookie(
-                options =>
-                {
-                    // Cookie settings
-                    options.Cookie.HttpOnly = true;
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                    options.SlidingExpiration = true;
-                });
-
-            services.AddHttpClient<IApiService, ApiService>(
-                    c => c.BaseAddress = new Uri(Configuration["WebApiUrl"]))
-                .SetHandlerLifetime(TimeSpan.FromMinutes(10));
-        }
+        
     }
 }
