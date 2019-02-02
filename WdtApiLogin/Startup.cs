@@ -53,9 +53,7 @@ namespace WdtApiLogin
             app.UseStatusCodePagesWithReExecute("/ErrorStatus/{0}");
 
             app.UseHttpsRedirection();
-
-            app.UseCookiePolicy();
-
+            
             app.UseAuthentication();
 
             app.UseSession();
