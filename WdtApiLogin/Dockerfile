@@ -5,14 +5,16 @@ EXPOSE 443
 
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
-COPY ["WdtApiLogin/WdtApiLogin.csproj", "WdtApiLogin/"]
-RUN dotnet restore "WdtApiLogin/WdtApiLogin.csproj"
+COPY WdtApiLogin/WdtApiLogin.csproj WdtApiLogin/
+COPY WdtUtils/WdtUtils.csproj WdtUtils/
+COPY WdtModels/WdtModels.csproj WdtModels/
+RUN dotnet restore WdtApiLogin/WdtApiLogin.csproj
 COPY . .
-WORKDIR "/src/WdtApiLogin"
-RUN dotnet build "WdtApiLogin.csproj" -c Release -o /app
+WORKDIR /src/WdtApiLogin
+RUN dotnet build WdtApiLogin.csproj -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish "WdtApiLogin.csproj" -c Release -o /app
+RUN dotnet publish WdtApiLogin.csproj -c Release -o /app
 
 FROM base AS final
 WORKDIR /app

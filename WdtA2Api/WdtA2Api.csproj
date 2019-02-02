@@ -26,4 +26,8 @@
     <ProjectReference Include="..\WdtUtils\WdtUtils.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistance\" />
+  </ItemGroup>
+
 </Project>

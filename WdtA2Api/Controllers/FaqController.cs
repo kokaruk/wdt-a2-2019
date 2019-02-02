@@ -16,18 +16,18 @@ namespace WdtA2Api.Controllers
     [ApiController]
     public class FaqController : ControllerBase
     {
-        private readonly WdtA2ApiContext _context;
+        private readonly UnitOfWork _unitOfWork;
 
         public FaqController(WdtA2ApiContext context)
         {
-            _context = context;
+            _unitOfWork = new UnitOfWork(context);
         }
 
         // GET: api/Faq
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Faq>>> GetRoom()
+        public async Task<IEnumerable<Faq>> GetAll()
         {
-            return await _context.Faq.ToListAsync();
+            return await _unitOfWork.Faq.GetAllAsync();
         }
 
     }

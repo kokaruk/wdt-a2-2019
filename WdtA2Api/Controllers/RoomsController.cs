@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 using WdtA2Api.Data;
+
 using WdtModels.ApiModels;
 
 namespace WdtA2Api.Controllers
@@ -12,93 +14,74 @@ namespace WdtA2Api.Controllers
     [ApiController]
     public class RoomsController : ControllerBase
     {
-        private readonly WdtA2ApiContext _context;
+        private readonly UnitOfWork _unitOfWork;
 
         public RoomsController(WdtA2ApiContext context)
         {
-            _context = context;
-        }
-
-        // DELETE: api/Rooms/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Room>> DeleteRoom(string id)
-        {
-            var room = await _context.Room.FindAsync(id);
-            if (room == null)
-            {
-                return NotFound();
-            }
-
-            _context.Room.Remove(room);
-            await _context.SaveChangesAsync();
-
-            return room;
+            _unitOfWork = new UnitOfWork(context);
         }
 
         // GET: api/Rooms
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Room>>> GetRoom()
-        {
-            return await _context.Room.ToListAsync();
-        }
+        public async Task<ActionResult<IEnumerable<Room>>> GetRoom() => Ok(await _unitOfWork.Room.GetAllAsync());
 
         // GET: api/Rooms/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Room>> GetRoom(string id)
         {
-            var room = await _context.Room.FindAsync(id);
-
-            if (room == null)
-            {
-                return NotFound();
-            }
-
-            return room;
+            var room = await _unitOfWork.Room.GetAsync(id);
+            return room != null ? Ok(room) : (ActionResult)NotFound();
         }
 
         // POST: api/Rooms
         [HttpPost]
         public async Task<ActionResult<Room>> PostRoom(Room room)
         {
-            _context.Room.Add(room);
-            await _context.SaveChangesAsync();
+            if (await _unitOfWork.Room.ExistsAsync(r => (r.RoomID == room.RoomID)))
+                return Conflict();
 
-            return CreatedAtAction("GetRoom", new {id = room.RoomID}, room);
+            if (room.RoomID.Length > 2)
+                return BadRequest();
+
+            await _unitOfWork.Room.AddAsync(room);
+            await _unitOfWork.CompleteAsync();
+
+            return CreatedAtAction("GetRoom", new { id = room.RoomID }, room);
         }
 
         // PUT: api/Rooms/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutRoom(string id, Room room)
         {
-            if (id != room.RoomID)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(room).State = EntityState.Modified;
+            if (id != room.RoomID ||
+                !await _unitOfWork.Room.ExistsAsync(r => (r.RoomID == room.RoomID)))
+                return NotFound();
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _unitOfWork.Room.AddAsync(room);
+                await _unitOfWork.CompleteAsync();
+
+                return NoContent();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RoomExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest();
             }
-
-            return NoContent();
         }
 
-        private bool RoomExists(string id)
+        // DELETE: api/Rooms/5
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<Room>> DeleteRoom(string id)
         {
-            return _context.Room.Any(e => e.RoomID == id);
+            var room = await _unitOfWork.Room.GetAsync(id);
+            if (room == null)
+                return NotFound();
+
+            _unitOfWork.Room.Remove(room);
+            await _unitOfWork.CompleteAsync();
+
+            return room;
         }
     }
 }
