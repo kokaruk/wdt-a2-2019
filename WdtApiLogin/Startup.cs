@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -31,13 +33,6 @@ namespace WdtApiLogin
         {
             services.Configure<GenericSettingsModel>(Configuration.GetSection("GenericSettings"));
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
-            
             services.AddMvc(
                 config =>
                 {
@@ -47,6 +42,15 @@ namespace WdtApiLogin
                     config.Filters.Add(new AuthorizeFilter(policy));
                 }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddSessionStateTempDataProvider();
 
+            // working behind proxy
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = 
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownProxies.Add(IPAddress.Parse("192.168.1.75"));
+            });
+                
+                
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("RequireStudentRole", policy => policy.RequireRole(UserConstants.Student));
@@ -56,7 +60,7 @@ namespace WdtApiLogin
             services.AddSession(
                 options =>
                 {
-                    options.IdleTimeout = TimeSpan.FromSeconds(40);
+                    options.IdleTimeout = TimeSpan.FromSeconds(120);
                     options.Cookie.HttpOnly = true;
                 });
 
@@ -68,6 +72,13 @@ namespace WdtApiLogin
                     options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                     options.SlidingExpiration = true;
                 });
+            
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => false;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
 
             services.AddHttpClient<IApiService, ApiService>(
                     c => c.BaseAddress = new Uri(Configuration["WebApiUrl"]))
@@ -89,13 +100,19 @@ namespace WdtApiLogin
             }
             else
             {
+                
+                app.UseForwardedHeaders(new ForwardedHeadersOptions
+                {
+                    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+                });
+                
                 app.UseExceptionHandler("/Home/Error");
 
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                // app.UseHsts();
+                app.UseHsts();
             }
             
-            app.UseHttpsRedirection();
+           // app.UseHttpsRedirection();
             app.UseStatusCodePages();
 
             app.UseStatusCodePagesWithReExecute("/ErrorStatus/{0}");
@@ -117,8 +134,6 @@ namespace WdtApiLogin
                     routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
                 });
         }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         
     }
 }

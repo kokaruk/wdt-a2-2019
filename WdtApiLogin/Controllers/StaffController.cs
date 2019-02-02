@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WdtApiLogin.Areas.Identity.Data;
 using WdtApiLogin.Models;
@@ -25,15 +26,18 @@ namespace WdtApiLogin.Controllers
         private readonly IApiService _apiService;
         private readonly IOptions<GenericSettingsModel> _genericSettings;
         private readonly UserManager<WdtApiLoginUser> _userManager;
+        private readonly ILogger _logger;
 
         public StaffController(
             IApiService apiService,
             UserManager<WdtApiLoginUser> userManager,
-            IOptions<GenericSettingsModel> genericSettings)
+            IOptions<GenericSettingsModel> genericSettings,
+            ILogger<StaffController> logger)
         {
             _apiService = apiService;
             _userManager = userManager;
             _genericSettings = genericSettings;
+            _logger = logger;
         }
 
         [TempData] public string GlobalStatusMessage { get; set; }
@@ -73,6 +77,7 @@ namespace WdtApiLogin.Controllers
 
         public async Task<IActionResult> Create()
         {
+            _logger.LogWarning($"{DateTime.Now:f} Time Issues");
             ViewBag.MinDate = _genericSettings.Value.WorkingHoursEnd.MinDate();
             ViewBag.MinHour = _genericSettings.Value.WorkingHoursStart;
             ViewBag.MaxHour = _genericSettings.Value.WorkingHoursEnd;
@@ -105,6 +110,7 @@ namespace WdtApiLogin.Controllers
         public async Task<IActionResult> Create([Bind] InputModel input)
         {
             if (ModelState.IsValid)
+            {
                 try
                 {
                     var user = await _userManager.GetUserAsync(User);
@@ -134,7 +140,9 @@ namespace WdtApiLogin.Controllers
                 {
                     GlobalStatusMessage = "Error creating new slot.";
                     return RedirectToAction(nameof(Create));
-                }
+                }   
+            }
+                
 
             ViewBag.MinDate = _genericSettings.Value.WorkingHoursEnd.MinDate();
             ViewBag.MinHour = _genericSettings.Value.WorkingHoursStart;

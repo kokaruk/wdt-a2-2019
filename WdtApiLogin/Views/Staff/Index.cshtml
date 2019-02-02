@@ -33,7 +33,7 @@
             {
                 <tr>
                     <td>@item.RoomID</td>
-                    <td>@item.StartTime</td>
+                    <td>@($"{item.StartTime:dd/MM/yyyy hh:mm tt}")</td>
                     <td>@(item.Student != null ? $"{item.Student.Name} ({item.Student.UserID})" : string.Empty)</td>
                     <td class="text-right">
                         @* https://stackoverflow.com/questions/44136636/mvc-button-click-call-post-action-method *@

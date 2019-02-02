@@ -1,12 +1,6 @@
 version: '3.4'
 
 services:
-  wdta2api:
-    image: ${DOCKER_REGISTRY-}wdta2api
-    build:
-      context: .
-      dockerfile: WdtA2Api/Dockerfile
-
   wdtapilogin:
     image: ${DOCKER_REGISTRY-}wdtapilogin
     build:
