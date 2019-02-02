@@ -19,7 +19,8 @@
     </div>
     <div class="form-group col-md-4">
         <label asp-for="StartDate"></label>
-        <input asp-for="StartDate"
+        <input required 
+               asp-for="StartDate"
                class="form-control"
                min="@($"{ViewBag.MinDate:yyyy-MM-dd}")"
                value="@(Model?.StartDate.Date >= DateTime.Now ? $"{Model?.StartDate:yyyy-MM-dd}" : string.Empty)"/>

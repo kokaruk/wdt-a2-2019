@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -21,8 +20,8 @@ namespace WdtApiLogin
 
         public Startup(IConfiguration configuration)
         {
-            this.Configuration = configuration;
-            this._connectionString = new Lazy<string>(configuration.BuildConnectionString());
+            Configuration = configuration;
+            _connectionString = new Lazy<string>(configuration.BuildConnectionString());
         }
 
         public IConfiguration Configuration { get; }
@@ -39,21 +38,22 @@ namespace WdtApiLogin
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
+                app.UseHttpsRedirection();
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
 
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                // app.UseHsts();
             }
 
             app.UseStatusCodePages();
-            
+
             app.UseStatusCodePagesWithReExecute("/ErrorStatus/{0}");
 
-            app.UseHttpsRedirection();
-            
+            app.UseCookiePolicy();
+
             app.UseAuthentication();
 
             app.UseSession();
@@ -63,9 +63,9 @@ namespace WdtApiLogin
                 {
                     // New Route
                     routes.MapRoute(
-                        name: "faq-route",
-                        template: "faq",
-                        defaults: new {controller = "Home", action = "Faq"});
+                        "faq-route",
+                        "faq",
+                        new {controller = "Home", action = "Faq"});
                     routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
                 });
         }
@@ -109,7 +109,7 @@ namespace WdtApiLogin
                 });
 
             services.AddHttpClient<IApiService, ApiService>(
-                    c => c.BaseAddress = new Uri(this.Configuration["WebApiUrl"]))
+                    c => c.BaseAddress = new Uri(Configuration["WebApiUrl"]))
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10));
         }
     }
