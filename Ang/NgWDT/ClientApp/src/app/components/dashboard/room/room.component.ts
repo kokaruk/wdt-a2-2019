@@ -40,7 +40,7 @@ export class RoomComponent implements OnInit {
   }
 
   private getAllUsers(): void {
-      this.userService.getAllUsers().subscribe(users => {
+    this.userService.getAllUsers().subscribe(users => {
       this.users = users;
       this.students = lodash.filter(this.users, user => user.userID.charAt(0) === 's'); // TODO move this to user service
       this.staff = lodash.filter(this.users, user => user.userID.charAt(0) === 'e'); // TODO move this to user service

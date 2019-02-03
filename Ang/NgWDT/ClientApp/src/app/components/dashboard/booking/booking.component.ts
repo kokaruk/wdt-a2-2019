@@ -34,7 +34,13 @@ export class BookingComponent implements OnInit {
   }
 
   deleteSlot(slot: ISlot): void {
-    this.bookingService.deleteSlot(slot);
+    console.log(`deleting slot`, slot);
+    this.bookingService.deleteSlot(slot).subscribe( s => {
+      console.log('for staff: ' + s.staffID);
+      const i = this.slots.findIndex(ss => this.slotPrimaryKeyPredicate(ss, s) );
+      console.log('deleteing at index ' + i);
+      this.slots.splice(i, 1);
+    });
   }
 
   public editSlot(slot: ISlot): void {
@@ -99,7 +105,7 @@ export class BookingComponent implements OnInit {
   }
 
   private modifyDisplay(): void {
-    (this.selectedUser != undefined) ?
+    (this.selectedUser !== undefined) ?
       this.displaySlots = lodash.filter(this.slots, slot => slot.staffID === this.selectedUser || slot.studentID === this.selectedUser)
       : this.displaySlots = this.slots;
   }
