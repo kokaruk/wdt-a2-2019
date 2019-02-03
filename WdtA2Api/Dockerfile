@@ -6,6 +6,8 @@ EXPOSE 443
 FROM microsoft/dotnet:2.2-sdk AS build
 WORKDIR /src
 COPY WdtA2Api/WdtA2Api.csproj WdtA2Api/
+COPY WdtUtils/WdtUtils.csproj WdtUtils/
+COPY WdtModels/WdtModels.csproj WdtModels/
 RUN dotnet restore WdtA2Api/WdtA2Api.csproj
 COPY . .
 WORKDIR /src/WdtA2Api

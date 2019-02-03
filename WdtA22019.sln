@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WdtUtils", "WdtUtils\WdtUti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WdtModels", "WdtModels\WdtModels.csproj", "{7CD76E8B-EAFF-4125-9075-8CBAE6232E6F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NgWDT", "Ang\NgWDT\NgWDT.csproj", "{565CB598-6413-407B-8E18-96094612101C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{7CD76E8B-EAFF-4125-9075-8CBAE6232E6F}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{7CD76E8B-EAFF-4125-9075-8CBAE6232E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CD76E8B-EAFF-4125-9075-8CBAE6232E6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{565CB598-6413-407B-8E18-96094612101C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{565CB598-6413-407B-8E18-96094612101C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{565CB598-6413-407B-8E18-96094612101C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{565CB598-6413-407B-8E18-96094612101C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
