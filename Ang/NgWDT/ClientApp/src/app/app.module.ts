@@ -10,13 +10,17 @@ import { MaterialModule } from './modules/material.module';
 import { PageNotFoundComponent } from './components/page-not-found/page-not-found.component';
 import { HttpClientModule } from '@angular/common/http';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { NavToolbarComponent } from './components/nav-toolbar/nav-toolbar.component';
+import { HomeComponent } from './components/home/home.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     TimeslotComponent,
     TimetableComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    NavToolbarComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
