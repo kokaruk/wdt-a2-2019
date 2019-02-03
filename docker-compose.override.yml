@@ -1,15 +1,15 @@
 version: '3.4'
 
 services:
-  wdta2api:
+  wdtapilogin:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=https://+:443;http://+:80
-      - ASPNETCORE_HTTPS_PORT=7001
-      - TZ=Australia/Melbourne
+      - ASPNETCORE_HTTPS_PORT=8001
+      - TZ="Australia/Melbourne"
     ports:
-      - "7000:80"
-      - "7001:443"
+      - "8000:80"
+      - "8001:443"
 #    volumes:
 #      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
 #      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro

@@ -77,7 +77,7 @@ namespace WdtApiLogin.Controllers
 
         public async Task<IActionResult> Create()
         {
-            _logger.LogWarning($"{DateTime.Now:f} Time Issues");
+            _logger.LogWarning($"{DateTime.Now:f}    |   Local Time Issues check");
             ViewBag.MinDate = _genericSettings.Value.WorkingHoursEnd.MinDate();
             ViewBag.MinHour = _genericSettings.Value.WorkingHoursStart;
             ViewBag.MaxHour = _genericSettings.Value.WorkingHoursEnd;
@@ -109,8 +109,11 @@ namespace WdtApiLogin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind] InputModel input)
         {
+
+            _logger.LogWarning($"{DateTime.Now:f}   |    Posting Create");
             if (ModelState.IsValid)
             {
+                _logger.LogWarning($"{DateTime.Now:f}    |   Model pass");
                 try
                 {
                     var user = await _userManager.GetUserAsync(User);
@@ -140,9 +143,9 @@ namespace WdtApiLogin.Controllers
                 {
                     GlobalStatusMessage = "Error creating new slot.";
                     return RedirectToAction(nameof(Create));
-                }   
+                }
             }
-                
+
 
             ViewBag.MinDate = _genericSettings.Value.WorkingHoursEnd.MinDate();
             ViewBag.MinHour = _genericSettings.Value.WorkingHoursStart;
