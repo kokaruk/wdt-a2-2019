@@ -15,10 +15,10 @@ export class BookingService {
   }
 
   editSlot(slot: ISlot): Observable<ISlot> {
-    return this.http.put<ISlot>(this.http.buildURL(this.endpoint, `${slot.roomID}/${slot.startTime}`), slot);
+    return this.http.put<ISlot>(this.http.buildURL(this.endpoint), slot);
   }
 
-  deleteSlot(slot: ISlot): void {
-    this.http.delete(this.http.buildURL(this.endpoint, `${slot.roomID}/${slot.startTime}`));
+  deleteSlot(slot: ISlot): Observable<ISlot> {
+    return this.http.delete(this.http.buildURL(this.endpoint, `${slot.roomID}/${slot.startTime}`));
   }
 }

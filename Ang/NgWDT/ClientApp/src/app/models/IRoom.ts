@@ -1,6 +1,6 @@
 import { ISlot } from './ISlot';
 
 export interface IRoom {
-    roomID: string;
+    roomID?: string;
     slots: Array<ISlot>;
 }

@@ -8,26 +8,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaterialModule } from '../../modules/material.module';
 
-const dashboardRoutes: Routes = [
-  {
-    path: 'dashboard',
-    children: [
-      {
-        path: '',
-        redirectTo: 'booking',
-        pathMatch: 'full'
-      },
-      {
-        path: 'booking',
-        component: BookingComponent
-      },
-      {
-        path: 'room',
-        component: RoomComponent
-      }
-    ]
-  },
-];
+const dashboardRoutes: Routes = [];
 
 @NgModule({
   imports: [

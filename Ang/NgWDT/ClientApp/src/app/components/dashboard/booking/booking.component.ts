@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { BookingService } from '../../../services/booking.service';
-import { ISlot } from '../../../models/ISlot';
+import {Component, OnInit} from '@angular/core';
+import {BookingService} from '../../../services/booking.service';
+import {ISlot} from '../../../models/ISlot';
 import * as lodash from 'lodash';
-import { IUser } from '../../../models/IUser';
-import { UserService } from '../../../services/user.service';
+import {IUser} from '../../../models/IUser';
+import {UserService} from '../../../services/user.service';
 
 @Component({
   selector: 'app-booking',
@@ -16,13 +16,15 @@ export class BookingComponent implements OnInit {
   users: Array<IUser> = [];
   students: Array<IUser> = [];
   staff: Array<IUser> = [];
-  staffToggle: boolean = true;
+  staffToggle: boolean;
   selectedUser: IUser;
 
   constructor(
     private bookingService: BookingService,
-    private userService: UserService
-  ) { }
+    private userService: UserService,
+  ) {
+    this.staffToggle = false;
+  }
 
   ngOnInit() {
     // get the slots
@@ -32,20 +34,37 @@ export class BookingComponent implements OnInit {
   }
 
   deleteSlot(slot: ISlot): void {
-    console.log(`deleting slot`, slot);
-    this.slots = lodash.filter(this.slots, currentSlot => {
-      return !this.slotPrimaryKeyPredicate(currentSlot, slot);
-    } );
-    // this.bookingService.deleteSlot(slot); TODO uncomment this
+    this.bookingService.deleteSlot(slot);
   }
 
-  editSlot(slot: ISlot): void {
-    console.log(`editing slot`, slot);
-    this.bookingService.editSlot(slot).subscribe(editedSlot => {
-      this.slots = lodash.map(this.slots, currentSlot => {
-        this.slotPrimaryKeyPredicate(currentSlot, editedSlot) ? editedSlot : currentSlot;
-      });
-    });
+  public editSlot(slot: ISlot): void {
+    console.log(`editing slot`);
+    if (!slot.studentID) {
+      slot.student = null;
+      slot.studentID = null;
+    }
+    const upSlot: ISlot = {
+      room: slot.room,
+      roomID: slot.roomID,
+      staff: slot.staff,
+      staffID: slot.staffID,
+      startTime: slot.startTime,
+      student: slot.student,
+      studentID: slot.studentID
+    };
+    this.bookingService.editSlot(upSlot).subscribe();
+  }
+
+  onStudentChange(slot: ISlot) {
+    const student = this.users.find(s => s.userID === slot.studentID);
+    if (student) {
+      console.log(student.userID + ' ' + student.name + ' ' + student.email);
+      slot.studentID = student.userID;
+      slot.student = student;
+    } else {
+      slot.studentID = null;
+      slot.student = null;
+    }
   }
 
   toggleStaff(): void {
@@ -80,8 +99,8 @@ export class BookingComponent implements OnInit {
   }
 
   private modifyDisplay(): void {
-    (this.selectedUser != undefined) ? 
-    this.displaySlots = lodash.filter(this.slots, slot => slot.staffID === this.selectedUser || slot.studentID === this.selectedUser)
-    : this.displaySlots = this.slots;
+    (this.selectedUser != undefined) ?
+      this.displaySlots = lodash.filter(this.slots, slot => slot.staffID === this.selectedUser || slot.studentID === this.selectedUser)
+      : this.displaySlots = this.slots;
   }
 }

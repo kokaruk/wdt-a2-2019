@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +8,8 @@ import { Observable } from 'rxjs';
 export class HttpHelperService {
   private readonly baseURL = 'https://staging.kokaruk.com/asdasfdasdygiuyg';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
   get<T>(url: string): Observable<T> {
     return this.http.get<T>(url);
@@ -22,8 +23,8 @@ export class HttpHelperService {
     return this.http.put<T>(url, data);
   }
 
-  delete(url: string): void {
-    this.http.delete(url);
+  delete<T>(url: string): Observable<T> {
+    return this.http.delete<T>(url);
   }
 
   buildURL(endpoint: string, id?: string): string {
@@ -32,6 +33,6 @@ export class HttpHelperService {
   }
 
   private furnishHeaders(): any {
-    // TODO
+    // TODO for tokenization service
   }
 }
