@@ -1,0 +1,29 @@
+<div *ngFor="let room of rooms">
+  <div>{{room.roomID}}</div>
+  <div *ngIf="room.slots">
+    <div *ngFor="let slot of room.slots">
+        <mat-accordion>
+          <mat-expansion-panel>
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-card>Room: {{slot.roomID}}</mat-card>
+                <mat-card *ngIf="slot.student">Student: {{slot.student.name}}</mat-card>
+                <mat-card>Staff: {{slot.staff.name}}</mat-card>
+              </mat-panel-title>
+              <mat-panel-description>
+                Slot: {{slot.startTime}}
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+          </mat-expansion-panel>
+        </mat-accordion>
+      </div>
+  </div>
+  <button mat-button (click)="editRoom(room)">Save</button>
+</div>
+<mat-form-field class="example-form-field">
+    <input matInput type="text" placeholder="Clearable input" [(ngModel)]="roomID">
+    <button mat-button *ngIf="roomID" matSuffix mat-icon-button aria-label="Clear" (click)="roomID=''">
+      <mat-icon>X</mat-icon>
+    </button>
+  </mat-form-field>
+<button mat-button [disabled]="!roomID" (click)="addRoom(roomID)">Add Room</button>
