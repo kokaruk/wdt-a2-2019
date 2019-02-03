@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -32,6 +32,46 @@ namespace WdtA2Api
 
         private string ConnectionString => this._connectionString.Value;
 
+        
+        // This method gets called by the runtime. Use this method to add services to the container.
+        // using net core 2_2 features as per https://www.youtube.com/watch?v=_vw3hcnSA1Y&t=420s
+        // https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-2.2&tabs=visual-studio%2Cvisual-studio-xml
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services.AddMvc().AddJsonOptions(
+                options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            
+            // working behind proxy
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = 
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+                options.KnownProxies.Add(IPAddress.Parse("192.168.1.75"));
+            });
+
+            // Register the Swagger services
+            services.AddSwaggerDocument(document =>
+            {
+                document.PostProcess = d =>
+                {
+                    d.Info.Title = "RMIT ASR";
+                };
+            });
+            // add CORS support
+            services.AddCors();
+
+            services.AddDbContext<WdtA2ApiContext>(
+                options => options
+                    .UseLazyLoadingProxies()
+                    .UseSqlServer(
+                        this.ConnectionString,
+                        opt => opt.EnableRetryOnFailure()));
+            services.AddHealthChecks().AddDbContextCheck<WdtA2ApiContext>();
+        }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -73,47 +113,8 @@ namespace WdtA2Api
                     .AllowAnyHeader()
                     .AllowAnyOrigin());
 
-            app.UseHttpsRedirection();
+          //  app.UseHttpsRedirection();
             app.UseMvc();
-        }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // using net core 2_2 features as per https://www.youtube.com/watch?v=_vw3hcnSA1Y&t=420s
-        // https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-2.2&tabs=visual-studio%2Cvisual-studio-xml
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc().AddJsonOptions(
-                options =>
-                    {
-                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                    }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
-            // swagger behind proxy
-            // https://github.com/RSuter/NSwag/wiki/AspNetCore-Middleware
-            services.Configure<ForwardedHeadersOptions>(options =>
-                {
-                    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-                });
-
-            // Register the Swagger services
-            services.AddSwaggerDocument(document =>
-                {
-                    document.PostProcess = d =>
-                        {
-                            d.Info.Title = "RMIT ASR";
-                        };
-                });
-            // add CORS support
-            services.AddCors();
-
-            services.AddDbContext<WdtA2ApiContext>(
-                options => options
-                    .UseLazyLoadingProxies()
-                    .UseSqlServer(
-                        this.ConnectionString,
-                        opt => opt.EnableRetryOnFailure()));
-            services.AddHealthChecks().AddDbContextCheck<WdtA2ApiContext>();
         }
     }
 }
