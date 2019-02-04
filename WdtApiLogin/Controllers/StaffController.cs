@@ -207,7 +207,7 @@ namespace WdtApiLogin.Controllers
 
             [Display(Name = "Slot Time")]
             [DataType(DataType.Time)]
-            [DisplayFormat(DataFormatString = "{0:hh:mm tt}", ApplyFormatInEditMode = true)]
+            [DisplayFormat(DataFormatString = "{0:h:mm tt}", ApplyFormatInEditMode = true)]
             [CorrectTimeRange(9, 15)]
             public DateTime StartTime { get; set; }
         }

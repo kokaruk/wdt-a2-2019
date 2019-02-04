@@ -16,7 +16,7 @@ namespace WdtUtils
 
         public static DateTime MinDate(this int cutoff)
         {
-            return DateTime.Now.Hour > cutoff
+            return DateTime.Now.AddHours(1).Hour >= cutoff
                 ? DateTime.Now.AddDays(1)
                 : DateTime.Now;
         }

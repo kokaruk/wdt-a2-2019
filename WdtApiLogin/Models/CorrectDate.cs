@@ -26,7 +26,8 @@ namespace WdtApiLogin.Models
 
             if (input.StartTime.TimeOfDay < _minTime || input.StartTime.TimeOfDay > _maxTime)
                 return new ValidationResult(GetErrorMessageForNonToday());
-            if (input.StartDate == DateTime.Today && input.StartTime.TimeOfDay <= _nextHOurOfNow)
+            if (input.StartDate.Date == DateTime.Today.Date && 
+                (input.StartTime.TimeOfDay < _nextHOurOfNow || input.StartTime.TimeOfDay > _maxTime))
                 return new ValidationResult(GetErrorMessageForToday());
 
             return ValidationResult.Success;
