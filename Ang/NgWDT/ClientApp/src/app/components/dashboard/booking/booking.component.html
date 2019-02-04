@@ -46,36 +46,8 @@
           </mat-select>
         </mat-form-field>
         <button mat-button (click)="editSlot(slot)">Save</button>
-        <button mat-button (click)="deleteSlot(slot)">Delete Slot</button>
+        <button [disabled]="slot.studentID" mat-button (click)="deleteSlot(slot)">Delete Slot</button>
       </mat-expansion-panel>
     </mat-accordion>
   </div>
 </div>
-
-
-
-<!--</mat-accordion>-->
-<!--<mat-accordion>-->
-  <!--<mat-expansion-panel>-->
-    <!--<mat-expansion-panel-header>-->
-      <!--<mat-panel-title>-->
-        <!--<mat-card>Room: {{slot.roomID}}</mat-card>-->
-        <!--<mat-card *ngIf="slot.student">Student: {{slot.student.name}}</mat-card>-->
-        <!--<mat-card>Staff: {{slot.staff.name}}</mat-card>-->
-      <!--</mat-panel-title>-->
-      <!--<mat-panel-description>-->
-        <!--Slot: {{slot.startTime}}-->
-      <!--</mat-panel-description>-->
-    <!--</mat-expansion-panel-header>-->
-
-    <!--<mat-form-field>-->
-      <!--<mat-select placeholder="Student" [(ngModel)]="slot.studentID">-->
-        <!--<mat-option *ngFor="let student of students" [value]="student.userID">-->
-          <!--{{student.name}}-->
-        <!--</mat-option>-->
-      <!--</mat-select>-->
-    <!--</mat-form-field>-->
-
-    <!--<button mat-button (click)="editSlot(slot)">Save</button>-->
-    <!--<button mat-button (click)="deleteSlot(slot)">Delete Slot</button>-->
-  <!--</mat-expansion-panel>-->

@@ -10,11 +10,7 @@ namespace WdtApiLogin.Models
         private readonly TimeSpan _maxTime;
         private readonly TimeSpan _minTime;
         private readonly TimeSpan _nextHOurOfNow;
-        private readonly ILogger _logger;
-        public CorrectTimeRange(ILogger<StaffController> logger)
-        {
-            _logger = logger;
-        }
+        
 
         public CorrectTimeRange(int minHour, int maxHour)
         {
@@ -41,7 +37,7 @@ namespace WdtApiLogin.Models
             var min = DateTime.Today + _minTime;
             var max = DateTime.Today + _maxTime;
             var errorMessage =  $"Enter slot in working hours from {min:h:mm tt} and {max:h:mm tt}";
-            _logger.LogWarning($"{DateTime.Now:f} {errorMessage}");
+            Console.WriteLine($@"{DateTime.Now:dd-MM-yyyy HH:mm} {errorMessage}");
             return errorMessage;
         }
 
@@ -50,7 +46,7 @@ namespace WdtApiLogin.Models
             var min = DateTime.Today + _nextHOurOfNow;
             var max = DateTime.Today + _maxTime;
             var errorMessage = $"Enter slot in working hours from {min:h:mm tt} and {max:h:mm tt}";
-            _logger.LogWarning($"{DateTime.Now:f} {errorMessage}");
+            Console.WriteLine($@"{DateTime.Now:dd-MM-yyyy HH:mm} {errorMessage}");
             return errorMessage;
         }
     }

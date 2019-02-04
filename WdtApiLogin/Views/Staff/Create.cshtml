@@ -28,7 +28,7 @@
             <div class="form-group col-md-4">
                 <label asp-for="StartTime"></label>
                 <input asp-for="StartTime" class="form-control"
-                       min="@($"{ViewBag.MinHour:00}"):00" max="@(ViewBag.MaxHour):00"
+                       min="@($"{ViewBag.MinHour:00}:00")" max="@($"{ViewBag.MaxHour:00}:00")"
                        value="@(Model == null ? string.Empty : $"{Model.StartTime:HH:mm}")"/>
                 <span asp-validation-for="StartTime" class="text-danger"></span>
             </div>
