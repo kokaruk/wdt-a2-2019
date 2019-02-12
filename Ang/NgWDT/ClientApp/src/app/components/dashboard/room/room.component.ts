@@ -7,6 +7,7 @@ import {UserService} from '../../../services/user.service';
 import {ISlot} from '../../../models/ISlot';
 import {BookingService} from '../../../services/booking.service';
 
+
 @Component({
   selector: 'app-room',
   templateUrl: './room.component.html',
