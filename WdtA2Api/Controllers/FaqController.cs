@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using WdtA2Api.Core;
 using WdtA2Api.Data;
 using WdtModels.ApiModels;
 
@@ -16,11 +16,11 @@ namespace WdtA2Api.Controllers
     [ApiController]
     public class FaqController : ControllerBase
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public FaqController(WdtA2ApiContext context)
+        public FaqController(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = new UnitOfWork(context);
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Faq
@@ -29,6 +29,5 @@ namespace WdtA2Api.Controllers
         {
             return await _unitOfWork.Faq.GetAllAsync();
         }
-
     }
 }

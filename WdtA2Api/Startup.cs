@@ -12,7 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 using NSwag.AspNetCore;
-
+using WdtA2Api.Core;
 using WdtA2Api.Data;
 using WdtUtils;
 
@@ -38,12 +38,7 @@ namespace WdtA2Api
         // https://docs.microsoft.com/en-us/aspnet/core/tutorials/getting-started-with-nswag?view=aspnetcore-2.2&tabs=visual-studio%2Cvisual-studio-xml
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().AddJsonOptions(
-                options =>
-                {
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            
             
             // working behind proxy
             services.Configure<ForwardedHeadersOptions>(options =>
@@ -61,8 +56,6 @@ namespace WdtA2Api
                     d.Info.Title = "RMIT ASR";
                 };
             });
-            // add CORS support
-            services.AddCors();
 
             services.AddDbContext<WdtA2ApiContext>(
                 options => options
@@ -71,6 +64,17 @@ namespace WdtA2Api
                         this.ConnectionString,
                         opt => opt.EnableRetryOnFailure()));
             services.AddHealthChecks().AddDbContextCheck<WdtA2ApiContext>();
+
+            services.AddMvc().AddJsonOptions(
+                options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            // add CORS support
+            services.AddCors();
+            services.AddScoped<IUnitOfWork, UnitOfWork>(); 
         }
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

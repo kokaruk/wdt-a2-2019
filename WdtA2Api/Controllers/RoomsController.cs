@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
+using WdtA2Api.Core;
 using WdtA2Api.Data;
 
 using WdtModels.ApiModels;
@@ -14,11 +14,11 @@ namespace WdtA2Api.Controllers
     [ApiController]
     public class RoomsController : ControllerBase
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public RoomsController(WdtA2ApiContext context)
+        public RoomsController(IUnitOfWork unitOfWork)
         {
-            _unitOfWork = new UnitOfWork(context);
+            _unitOfWork = unitOfWork;
         }
 
         // GET: api/Rooms
