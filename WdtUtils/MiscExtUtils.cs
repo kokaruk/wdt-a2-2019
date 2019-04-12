@@ -41,7 +41,7 @@ namespace WdtUtils
         }
     }
 
-    // serializing temp data 
+    // serializing temp data in MVC
     // https://stackoverflow.com/questions/34638823/store-complex-object-in-tempdata
     public static class TempDataExtensions
     {
